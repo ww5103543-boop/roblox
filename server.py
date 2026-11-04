@@ -128,6 +128,10 @@ def clean_cookie_value(raw: str) -> str:
     val = (raw or "").strip()
     if val.startswith(".ROBLOSECURITY="):
         val = val[len(".ROBLOSECURITY="):].split(";", 1)[0].strip()
+    if val.startswith('"') and val.endswith('"') and len(val) >= 2:
+        val = val[1:-1].strip()
+    if val.startswith("'") and val.endswith("'") and len(val) >= 2:
+        val = val[1:-1].strip()
     return val
 
 def get_or_create_session(sid: str | None) -> tuple[ClientSession, bool]:

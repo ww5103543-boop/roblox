@@ -138,7 +138,10 @@
               Paste Cookie
             </button>
           </div>
-          <div id="web-login-status" style="display:none;margin-top:12px;font-size:12px;font-weight:600;color:#f7768e;"></div>
+          <div id="web-login-status" style="display:none;margin-top:12px;font-size:12px;font-weight:600;color:#f7768e;line-height:1.4;"></div>
+          <div style="margin-top:16px;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.4;">
+            How to get cookie: On <b>roblox.com</b>, press <b>F12</b> &rarr; <b>Application</b> &rarr; <b>Cookies</b> &rarr; copy <b>.ROBLOSECURITY</b> value
+          </div>
         </div>
       `;
       mount.appendChild(wrap);
@@ -161,7 +164,16 @@
       const cookieBtn = wrap.querySelector("#web-login-cookie-btn");
       const statusEl = wrap.querySelector("#web-login-status");
 
-      if (loginBtn) loginBtn.addEventListener("click", () => openRbx("https://www.roblox.com/login"));
+      if (loginBtn) {
+        loginBtn.addEventListener("click", () => {
+          openRbx("https://www.roblox.com/login");
+          if (statusEl) {
+            statusEl.style.display = "block";
+            statusEl.style.color = "#a9b1d6";
+            statusEl.textContent = "Opened Roblox login! Once logged in, paste your .ROBLOSECURITY cookie below to finish connecting.";
+          }
+        });
+      }
 
       const submitCookie = async () => {
         const val = (cookieInput && cookieInput.value ? cookieInput.value : "").trim();
@@ -182,7 +194,7 @@
           if (statusEl) {
             statusEl.style.display = "block";
             statusEl.style.color = "#f7768e";
-            statusEl.textContent = "Invalid cookie.";
+            statusEl.textContent = "Invalid cookie: " + (e && e.message ? e.message : "rejected by Roblox");
           }
         }
       };
@@ -191,6 +203,9 @@
       if (cookieInput) {
         cookieInput.addEventListener("keydown", (ev) => {
           if (ev.key === "Enter") submitCookie();
+        });
+        cookieInput.addEventListener("paste", () => {
+          setTimeout(submitCookie, 60);
         });
       }
 
