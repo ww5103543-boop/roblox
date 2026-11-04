@@ -107,7 +107,7 @@
         "padding:24px",
         "box-sizing:border-box",
         "background-color:#111218",
-        "background-image:radial-gradient(circle at center, rgba(18,20,30,0.52) 0%, rgba(10,11,16,0.88) 100%), url('/login-bg.jpg')",
+        "background-image:radial-gradient(circle at center, rgba(18,20,30,0.6) 0%, rgba(10,11,16,0.92) 100%), url('/login-bg.jpg')",
         "background-size:cover",
         "background-position:center center",
         "background-repeat:no-repeat",
@@ -116,62 +116,261 @@
         "justify-content:center",
         "z-index:200",
       ].join(";");
+
       wrap.innerHTML = `
-        <div style="width:100%;max-width:380px;margin:auto;box-sizing:border-box;background:rgba(24,26,36,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:32px 28px;box-shadow:0 24px 64px rgba(0,0,0,0.75);color:#ffffff;display:flex;flex-direction:column;align-items:center;text-align:center;">
-          <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:24px;color:#ffffff;">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor">
+        <div style="width:100%;max-width:400px;margin:auto;box-sizing:border-box;background:rgba(24,26,36,0.95);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.14);border-radius:16px;padding:32px 28px;box-shadow:0 24px 64px rgba(0,0,0,0.85);color:#ffffff;display:flex;flex-direction:column;align-items:center;text-align:center;">
+          <!-- Branding -->
+          <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px;color:#ffffff;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
               <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
             </svg>
             <span style="font-size:24px;font-weight:800;letter-spacing:0.3px;">Insomniac</span>
           </div>
-          <button id="web-login-open-btn" style="width:100%;height:44px;border-radius:8px;border:none;background:#ffffff;color:#111218;font-size:15px;font-weight:800;cursor:pointer;transition:opacity 0.15s;">
-            Login
-          </button>
-          <div style="display:flex;align-items:center;width:100%;gap:10px;margin:16px 0;color:rgba(255,255,255,0.45);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;">
-            <div style="flex:1;height:1px;background:rgba(255,255,255,0.12);"></div>
-            <span>or</span>
-            <div style="flex:1;height:1px;background:rgba(255,255,255,0.12);"></div>
-          </div>
-          <div style="display:flex;width:100%;gap:8px;box-sizing:border-box;">
-            <input id="web-login-cookie-input" type="password" placeholder="Paste .ROBLOSECURITY" style="flex:1;min-width:0;height:40px;box-sizing:border-box;background:rgba(12,13,19,0.85);border:1px solid rgba(255,255,255,0.16);border-radius:8px;padding:0 12px;color:#ffffff;font-size:13px;outline:none;" />
-            <button id="web-login-cookie-btn" style="height:40px;padding:0 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.1);color:#ffffff;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;">
-              Paste Cookie
+
+          <!-- State 1: Default View -->
+          <div id="web-login-default-view" style="width:100%;display:flex;flex-direction:column;align-items:center;">
+            <div style="font-size:14px;color:rgba(255,255,255,0.72);margin-bottom:20px;line-height:1.45;">
+              Sign in with your Roblox account to browse and play experiences.
+            </div>
+
+            <button id="web-login-open-btn" style="width:100%;height:46px;border-radius:10px;border:none;background:#ffffff;color:#111218;font-size:15px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 4px 20px rgba(255,255,255,0.18);transition:all 0.15s ease;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18.92 2.01L5.08 6.84 2.01 20.69 15.85 15.86 18.92 2.01zM13.44 13.44l-4.14 1.45-1.45-4.14 4.14-1.45 1.45 4.14z"/>
+              </svg>
+              <span>Log In with Roblox</span>
             </button>
+
+            <div style="display:flex;align-items:center;width:100%;gap:10px;margin:20px 0 14px 0;color:rgba(255,255,255,0.35);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;">
+              <div style="flex:1;height:1px;background:rgba(255,255,255,0.1);"></div>
+              <span>or</span>
+              <div style="flex:1;height:1px;background:rgba(255,255,255,0.1);"></div>
+            </div>
+
+            <button id="web-login-toggle-cookie-btn" style="background:transparent;border:none;color:rgba(255,255,255,0.55);font-size:12px;font-weight:600;cursor:pointer;text-decoration:underline;padding:4px 8px;">
+              Paste .ROBLOSECURITY manually
+            </button>
+
+            <div id="web-login-cookie-panel" style="display:none;width:100%;margin-top:14px;">
+              <div style="display:flex;width:100%;gap:8px;box-sizing:border-box;">
+                <input id="web-login-cookie-input" type="password" placeholder="Paste .ROBLOSECURITY" style="flex:1;min-width:0;height:40px;box-sizing:border-box;background:rgba(12,13,19,0.85);border:1px solid rgba(255,255,255,0.16);border-radius:8px;padding:0 12px;color:#ffffff;font-size:13px;outline:none;" />
+                <button id="web-login-cookie-btn" style="height:40px;padding:0 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.1);color:#ffffff;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;">
+                  Paste
+                </button>
+              </div>
+            </div>
           </div>
-          <div id="web-login-status" style="display:none;margin-top:12px;font-size:12px;font-weight:600;color:#f7768e;line-height:1.4;"></div>
-          <div style="margin-top:16px;font-size:11px;color:rgba(255,255,255,0.45);line-height:1.4;">
-            How to get cookie: On <b>roblox.com</b>, press <b>F12</b> &rarr; <b>Application</b> &rarr; <b>Cookies</b> &rarr; copy <b>.ROBLOSECURITY</b> value
+
+          <!-- State 2: Active Quick Login In-Progress View -->
+          <div id="web-login-active-view" style="width:100%;display:none;flex-direction:column;align-items:center;">
+            <div style="font-size:13px;font-weight:600;color:rgba(255,255,255,0.7);margin-bottom:8px;">
+              Your One-Time Login Code:
+            </div>
+            <div id="web-login-code-display" style="font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:26px;font-weight:900;letter-spacing:5px;padding:10px 20px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.22);border-radius:10px;color:#7aa2f7;margin-bottom:14px;user-select:all;">
+              ------
+            </div>
+
+            <div id="web-login-qr-wrap" style="display:none;flex-direction:column;align-items:center;margin-bottom:14px;">
+              <img id="web-login-qr-img" style="width:116px;height:116px;border-radius:8px;border:2px solid rgba(255,255,255,0.22);background:#ffffff;padding:4px;" alt="QR Code" />
+              <span style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:6px;">Scan with Roblox Mobile App</span>
+            </div>
+
+            <div id="web-login-active-msg" style="font-size:13px;font-weight:600;color:#e0af68;line-height:1.45;margin-bottom:16px;">
+              Roblox window opened! Please log in and click Confirm.
+            </div>
+
+            <div style="display:flex;width:100%;gap:10px;">
+              <button id="web-login-reopen-btn" style="flex:1;height:38px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:#ffffff;font-size:12px;font-weight:700;cursor:pointer;">
+                Reopen Window
+              </button>
+              <button id="web-login-cancel-btn" style="height:38px;padding:0 14px;border-radius:8px;border:none;background:rgba(247,118,142,0.18);color:#f7768e;font-size:12px;font-weight:700;cursor:pointer;">
+                Cancel
+              </button>
+            </div>
           </div>
+
+          <!-- Status Message -->
+          <div id="web-login-status" style="display:none;margin-top:14px;font-size:12px;font-weight:600;color:#f7768e;line-height:1.4;"></div>
         </div>
       `;
       mount.appendChild(wrap);
       this.overlay = wrap;
 
-      const openRbx = (url) => {
-        const w = 480;
-        const h = 640;
-        const left = Math.max(0, Math.round(window.screenX + (window.outerWidth - w) / 2));
-        const top = Math.max(0, Math.round(window.screenY + (window.outerHeight - h) / 2));
-        this.loginPopup = window.open(
-          url,
-          "insomniac_login_frame",
-          `popup=yes,width=${w},height=${h},left=${left},top=${top}`
-        );
-      };
-
+      const defaultView = wrap.querySelector("#web-login-default-view");
+      const activeView = wrap.querySelector("#web-login-active-view");
       const loginBtn = wrap.querySelector("#web-login-open-btn");
+      const codeDisplay = wrap.querySelector("#web-login-code-display");
+      const qrWrap = wrap.querySelector("#web-login-qr-wrap");
+      const qrImg = wrap.querySelector("#web-login-qr-img");
+      const activeMsg = wrap.querySelector("#web-login-active-msg");
+      const reopenBtn = wrap.querySelector("#web-login-reopen-btn");
+      const cancelBtn = wrap.querySelector("#web-login-cancel-btn");
+      const toggleCookieBtn = wrap.querySelector("#web-login-toggle-cookie-btn");
+      const cookiePanel = wrap.querySelector("#web-login-cookie-panel");
       const cookieInput = wrap.querySelector("#web-login-cookie-input");
       const cookieBtn = wrap.querySelector("#web-login-cookie-btn");
       const statusEl = wrap.querySelector("#web-login-status");
 
-      if (loginBtn) {
-        loginBtn.addEventListener("click", () => {
-          openRbx("https://www.roblox.com/login");
-          if (statusEl) {
-            statusEl.style.display = "block";
-            statusEl.style.color = "#a9b1d6";
-            statusEl.textContent = "Opened Roblox login! Once logged in, paste your .ROBLOSECURITY cookie below to finish connecting.";
+      let pollTimer = null;
+      let activeConfirmUrl = "";
+
+      const showDefault = () => {
+        if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+        if (defaultView) defaultView.style.display = "flex";
+        if (activeView) activeView.style.display = "none";
+      };
+
+      const showActive = (code, url, qr) => {
+        if (defaultView) defaultView.style.display = "none";
+        if (activeView) activeView.style.display = "flex";
+        if (codeDisplay) codeDisplay.textContent = code || "------";
+        activeConfirmUrl = url || "";
+        if (qr && qrImg && qrWrap) {
+          qrImg.src = qr;
+          qrWrap.style.display = "flex";
+        } else if (qrWrap) {
+          qrWrap.style.display = "none";
+        }
+        if (activeMsg) {
+          activeMsg.style.color = "#e0af68";
+          activeMsg.textContent = "Roblox window opened! Please log in and click Confirm.";
+        }
+      };
+
+      if (toggleCookieBtn && cookiePanel) {
+        toggleCookieBtn.addEventListener("click", () => {
+          const isHidden = cookiePanel.style.display === "none";
+          cookiePanel.style.display = isHidden ? "block" : "none";
+          toggleCookieBtn.textContent = isHidden ? "Hide manual cookie entry" : "Paste .ROBLOSECURITY manually";
+        });
+      }
+
+      const openPopup = (url) => {
+        const w = 480;
+        const h = 640;
+        const left = Math.max(0, Math.round(window.screenX + (window.outerWidth - w) / 2));
+        const top = Math.max(0, Math.round(window.screenY + (window.outerHeight - h) / 2));
+        if (this.loginPopup && !this.loginPopup.closed) {
+          try {
+            if (url) this.loginPopup.location.href = url;
+            this.loginPopup.focus();
+            return this.loginPopup;
+          } catch (e) {}
+        }
+        this.loginPopup = window.open(
+          url || "about:blank",
+          "insomniac_login_frame",
+          `popup=yes,width=${w},height=${h},left=${left},top=${top}`
+        );
+        return this.loginPopup;
+      };
+
+      if (reopenBtn) {
+        reopenBtn.addEventListener("click", () => {
+          if (activeConfirmUrl) openPopup(activeConfirmUrl);
+        });
+      }
+
+      if (cancelBtn) {
+        cancelBtn.addEventListener("click", () => {
+          if (this.loginPopup && !this.loginPopup.closed) {
+            try { this.loginPopup.close(); } catch (e) {}
           }
+          showDefault();
+        });
+      }
+
+      if (loginBtn) {
+        loginBtn.addEventListener("click", async () => {
+          if (statusEl) {
+            statusEl.style.display = "none";
+            statusEl.textContent = "";
+          }
+
+          // 1. Open popup synchronously to prevent browser popup blockers
+          const win = openPopup("about:blank");
+          if (win) {
+            try {
+              win.document.write(`
+                <!DOCTYPE html>
+                <html><head><title>Roblox Login - Insomniac</title><style>
+                body{background:#111218;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;margin:0;font-family:sans-serif;text-align:center;}
+                .spinner{width:36px;height:36px;border:3px solid rgba(255,255,255,0.15);border-top-color:#7aa2f7;border-radius:50%;animation:s 0.8s linear infinite;margin-bottom:16px;}
+                @keyframes s{to{transform:rotate(360deg);}}
+                </style></head><body><div class="spinner"></div><div style="font-weight:700;">Connecting to Roblox...</div></body></html>
+              `);
+            } catch (e) {}
+          }
+
+          // 2. Start quick login session
+          let startRes;
+          try {
+            const r = await fetch("/api/rbx/quick-login/start", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" }
+            });
+            startRes = await r.json();
+          } catch (e) {
+            startRes = { ok: false, error: e.message };
+          }
+
+          if (!startRes || !startRes.ok || !startRes.code) {
+            if (win && !win.closed) { try { win.close(); } catch (e) {} }
+            if (statusEl) {
+              statusEl.style.display = "block";
+              statusEl.style.color = "#f7768e";
+              statusEl.textContent = "Failed to connect to Roblox: " + (startRes?.error || "network error");
+            }
+            return;
+          }
+
+          // 3. Navigate popup to Roblox confirmation URL
+          if (win && !win.closed) {
+            win.location.href = startRes.url;
+          }
+          showActive(startRes.code, startRes.url, startRes.qrDataUri);
+
+          // 4. Poll status
+          if (pollTimer) clearInterval(pollTimer);
+          pollTimer = setInterval(async () => {
+            try {
+              const r = await fetch("/api/rbx/quick-login/poll", { cache: "no-store" });
+              const res = await r.json();
+              if (res.status === "Validated" && res.ok) {
+                clearInterval(pollTimer);
+                pollTimer = null;
+                if (res.cookie) {
+                  localStorage.setItem("weblox_rbx_cookie", res.cookie);
+                }
+                if (activeMsg) {
+                  activeMsg.style.color = "#9ece6a";
+                  activeMsg.textContent = `Success! Logged in as ${res.user ? res.user.name : "Roblox User"}.`;
+                }
+                if (this.loginPopup && !this.loginPopup.closed) {
+                  try { this.loginPopup.close(); } catch (e) {}
+                }
+                await sleep(500);
+                this.visible(false);
+              } else if (res.status === "Denied") {
+                clearInterval(pollTimer);
+                pollTimer = null;
+                if (statusEl) {
+                  statusEl.style.display = "block";
+                  statusEl.style.color = "#f7768e";
+                  statusEl.textContent = "Login was denied on Roblox. Please try again.";
+                }
+                showDefault();
+              } else if (res.status === "Expired") {
+                clearInterval(pollTimer);
+                pollTimer = null;
+                if (statusEl) {
+                  statusEl.style.display = "block";
+                  statusEl.style.color = "#f7768e";
+                  statusEl.textContent = "Login session expired. Click Log In to generate a new code.";
+                }
+                showDefault();
+              }
+            } catch (e) {}
+          }, 1200);
         });
       }
 
@@ -184,12 +383,15 @@
           statusEl.textContent = "Verifying...";
         }
         try {
-          await this.injectCookie(val);
+          const user = await this.injectCookie(val);
+          localStorage.setItem("weblox_rbx_cookie", val);
           if (cookieInput) cookieInput.value = "";
           if (statusEl) {
             statusEl.style.display = "none";
             statusEl.textContent = "";
           }
+          this.visible(false);
+          return user;
         } catch (e) {
           if (statusEl) {
             statusEl.style.display = "block";
@@ -290,6 +492,16 @@
           await sleep(160);
           user = await check().catch(() => null);
         }
+        if (!user) {
+          const saved = localStorage.getItem("weblox_rbx_cookie");
+          if (saved) {
+            try {
+              user = await this.injectCookie(saved);
+            } catch (e) {
+              localStorage.removeItem("weblox_rbx_cookie");
+            }
+          }
+        }
         return user || null;
       }
 
@@ -314,6 +526,7 @@
         if (!doc || !doc.ok || !doc.user) {
           throw new Error(doc.error || "cookie rejected");
         }
+        try { localStorage.setItem("weblox_rbx_cookie", value); } catch (e) {}
         this.log(`logged in as ${doc.user.name} (${doc.user.id})`);
         return doc.user;
       }
@@ -552,7 +765,13 @@
 
     navigate(url) {
       if (!IS_IWA) {
-        if (url) location.href = url;
+        if (url) {
+          const w = 480;
+          const h = 640;
+          const left = Math.max(0, Math.round(window.screenX + (window.outerWidth - w) / 2));
+          const top = Math.max(0, Math.round(window.screenY + (window.outerHeight - h) / 2));
+          window.open(url, "insomniac_login_frame", `popup=yes,width=${w},height=${h},left=${left},top=${top}`);
+        }
         return;
       }
       if (this.frame && url) {
@@ -636,6 +855,8 @@
 
     async logout() {
       if (!IS_IWA) {
+        try { localStorage.removeItem("weblox_rbx_cookie"); } catch (e) {}
+        try { localStorage.removeItem("weblox_user_logged_in"); } catch (e) {}
         try {
           window.postMessage({ type: "WEBLOX_LOGOUT_EXT" }, "*");
         } catch (e) {}

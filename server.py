@@ -117,6 +117,7 @@ class ClientSession:
         self.csrf = ""
         self.last_join_reply: dict | None = None
         self.last_join_script: dict | None = None
+        self.quick_login: dict | None = None
         self.last_seen = time.time()
         self.lock = threading.Lock()
 
@@ -194,6 +195,130 @@ def rbx_http_call(
         status, final_url, res_headers, data = send_one(req_headers)
 
     return status, final_url, res_headers, data, new_csrf
+
+
+def quick_login_start(sess: ClientSession) -> dict:
+    url = "https://apis.roblox.com/auth-token-service/v1/login/create"
+    req = urllib.request.Request(
+        url,
+        data=b"",
+        method="POST",
+        headers={"Content-Type": "application/json", "User-Agent": "Roblox/WinInet"},
+    )
+    with urllib.request.urlopen(req, context=_SSL_CTX, timeout=10.0) as resp:
+        doc = json.loads(resp.read().decode("utf-8"))
+    code = doc.get("code")
+    pk = doc.get("privateKey")
+    if not code or not pk:
+        raise RuntimeError("failed to generate quick login code")
+    with sess.lock:
+        sess.quick_login = {
+            "code": code,
+            "privateKey": pk,
+            "csrf": "",
+            "expires": time.time() + 300,
+        }
+    qr_data_uri = ""
+    image_path = doc.get("imagePath")
+    if image_path:
+        try:
+            qr_url = f"https://apis.roblox.com/auth-token-service{image_path}"
+            qr_req = urllib.request.Request(qr_url, headers={"User-Agent": "Roblox/WinInet"})
+            with urllib.request.urlopen(qr_req, context=_SSL_CTX, timeout=5.0) as qr_resp:
+                qr_bytes = qr_resp.read()
+                qr_data_uri = "data:image/png;base64," + base64.b64encode(qr_bytes).decode("ascii")
+        except Exception:
+            pass
+    return {
+        "ok": True,
+        "code": code,
+        "url": f"https://www.roblox.com/crossdevicelogin/confirmcode?code={code}",
+        "qrDataUri": qr_data_uri,
+    }
+
+
+def quick_login_poll(sess: ClientSession) -> dict:
+    with sess.lock:
+        ql = sess.quick_login
+    if not ql:
+        return {"status": "None"}
+    if time.time() > ql["expires"]:
+        with sess.lock:
+            sess.quick_login = None
+        return {"status": "Expired"}
+
+    code = ql["code"]
+    pk = ql["privateKey"]
+    csrf = ql.get("csrf", "")
+
+    status_url = "https://apis.roblox.com/auth-token-service/v1/login/status"
+    body = json.dumps({"code": code, "privateKey": pk}).encode("utf-8")
+    headers = {"Content-Type": "application/json", "User-Agent": "Roblox/WinInet"}
+    if csrf:
+        headers["x-csrf-token"] = csrf
+
+    req = urllib.request.Request(status_url, data=body, method="POST", headers=headers)
+    try:
+        with urllib.request.urlopen(req, context=_SSL_CTX, timeout=8.0) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        if e.code == 403 and "x-csrf-token" in e.headers:
+            new_csrf = e.headers["x-csrf-token"]
+            with sess.lock:
+                if sess.quick_login:
+                    sess.quick_login["csrf"] = new_csrf
+            headers["x-csrf-token"] = new_csrf
+            req2 = urllib.request.Request(status_url, data=body, method="POST", headers=headers)
+            with urllib.request.urlopen(req2, context=_SSL_CTX, timeout=8.0) as resp2:
+                data = json.loads(resp2.read().decode("utf-8"))
+        else:
+            return {"status": "Error", "error": str(e)}
+
+    status = data.get("status")
+    if status == "Validated":
+        login_url = "https://auth.roblox.com/v2/login"
+        login_body = json.dumps({"ctype": "AuthToken", "cvalue": code, "password": pk}).encode("utf-8")
+        login_headers = {"Content-Type": "application/json", "User-Agent": "Roblox/WinInet"}
+        if csrf:
+            login_headers["X-CSRF-TOKEN"] = csrf
+
+        def exchange(tok: str) -> str:
+            h = dict(login_headers)
+            if tok:
+                h["X-CSRF-TOKEN"] = tok
+            l_req = urllib.request.Request(login_url, data=login_body, method="POST", headers=h)
+            try:
+                with urllib.request.urlopen(l_req, context=_SSL_CTX, timeout=10.0) as l_resp:
+                    set_cookies = l_resp.headers.get_all("set-cookie") or []
+                    for sc in set_cookies:
+                        if ".ROBLOSECURITY=" in sc:
+                            return clean_cookie_value(sc)
+                    return ""
+            except urllib.error.HTTPError as he:
+                if he.code == 403 and "x-csrf-token" in he.headers:
+                    return exchange(he.headers["x-csrf-token"])
+                return ""
+
+        cookie_val = exchange(csrf)
+        if cookie_val:
+            with sess.lock:
+                sess.cookie = cookie_val
+                sess.quick_login = None
+            u_status, _, _, u_data, _ = rbx_http_call(
+                "https://users.roblox.com/v1/users/authenticated",
+                cookie=cookie_val,
+            )
+            user = None
+            if u_status == 200:
+                try:
+                    u = json.loads(u_data.decode("utf-8"))
+                    user = {"id": u.get("id"), "name": u.get("name"), "displayName": u.get("displayName")}
+                except Exception:
+                    pass
+            return {"status": "Validated", "ok": True, "user": user, "cookie": cookie_val}
+        return {"status": "Validated", "ok": False, "error": "cookie extraction failed"}
+
+    return {"status": status}
 
 def perform_gamejoin(place_id: int, session: ClientSession) -> dict:
     """Negotiate a Roblox game join over persistent TLS."""
@@ -381,9 +506,11 @@ class InsomniacHandler(BaseHTTPRequestHandler):
         self.send_header("access-control-allow-origin", "*")
         self.send_header("access-control-allow-credentials", "true")
         self.send_header("access-control-allow-headers", "content-type, authorization, x-session-id")
+        self.send_header("access-control-expose-headers", "x-session-id")
         self.send_header("cache-control", "public, max-age=86400" if cacheable else "no-store")
-        if is_new_sid and sid:
+        if sid:
             self.send_header("set-cookie", f"insomniac_sid={sid}; Path=/; SameSite=Lax; Max-Age=31536000")
+            self.send_header("x-session-id", sid)
         self.end_headers()
 
     def _respond(self, status: int, ct: str, body: bytes, cacheable: bool, is_new_sid: bool = False, sid: str = ""):
@@ -414,6 +541,14 @@ class InsomniacHandler(BaseHTTPRequestHandler):
 
         if parsed.path == "/__udp":
             self._handle_udp_ws(parsed)
+            return
+
+        if parsed.path == "/api/rbx/quick-login/poll":
+            try:
+                res = quick_login_poll(sess)
+                self._respond_json(200, res, is_new_sid=is_new, sid=sess.sid)
+            except Exception as e:
+                self._respond_json(500, {"status": "Error", "error": str(e)}, is_new_sid=is_new, sid=sess.sid)
             return
 
         if parsed.path == "/api/rbx/whoami":
@@ -472,6 +607,22 @@ class InsomniacHandler(BaseHTTPRequestHandler):
             doc = json.loads(raw_body.decode("utf-8", errors="replace"))
         except Exception:
             doc = {}
+
+        if parsed.path == "/api/rbx/quick-login/start":
+            try:
+                res = quick_login_start(sess)
+                self._respond_json(200, res, is_new_sid=is_new, sid=sess.sid)
+            except Exception as e:
+                self._respond_json(500, {"ok": False, "error": str(e)}, is_new_sid=is_new, sid=sess.sid)
+            return
+
+        if parsed.path == "/api/rbx/quick-login/poll":
+            try:
+                res = quick_login_poll(sess)
+                self._respond_json(200, res, is_new_sid=is_new, sid=sess.sid)
+            except Exception as e:
+                self._respond_json(500, {"status": "Error", "error": str(e)}, is_new_sid=is_new, sid=sess.sid)
+            return
 
         if parsed.path == "/api/rbx/cookie":
             val = clean_cookie_value(doc.get("cookie", ""))
