@@ -1,0 +1,3 @@
+# Insomniac runs purely on the Python standard library.
+# No third-party pip dependencies required.
+

@@ -1,0 +1,1 @@
+window.__rkAbi = {"base":2146435072,"magic":0,"txHead":4,"txTail":8,"rxHead":12,"rxTail":16,"wake":20,"selects":24,"recvd":28,"addr":32,"peer":48,"updates":52,"slot":1536,"slots":64,"tx0":128,"rx0":98432,"maxDatagram":1500};

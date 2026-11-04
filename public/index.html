@@ -1,0 +1,1547 @@
+<!doctype html>
+<html lang="en" data-theme="tokyo-night">
+
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="data:,">
+  <title>Insomniac</title>
+  <style>
+    @font-face {
+      font-family: "Builder Sans";
+      src: url("/engine/content/fonts/BuilderSans-Regular.otf") format("opentype");
+      font-weight: 400;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: "Builder Sans";
+      src: url("/engine/content/fonts/BuilderSans-Medium.otf") format("opentype");
+      font-weight: 500;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: "Builder Sans";
+      src: url("/engine/content/fonts/BuilderSans-Medium.otf") format("opentype");
+      font-weight: 600;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: "Builder Sans";
+      src: url("/engine/content/fonts/BuilderSans-Bold.otf") format("opentype");
+      font-weight: 700;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: "Builder Sans";
+      src: url("/engine/content/fonts/BuilderSans-ExtraBold.otf") format("opentype");
+      font-weight: 800;
+      font-style: normal;
+    }
+
+    /* =======================================================================
+     THEME PALETTES: TOKYO NIGHT, DARK, LIGHT
+     ======================================================================= */
+    :root,
+    html[data-theme="tokyo-night"] {
+      --tn-bg: #1a1b26;
+      --tn-bg-dark: #16161e;
+      --tn-surface: #1f2335;
+      --tn-surface-hi: #24283b;
+      --tn-input: #13141c;
+      --tn-border: #292e42;
+      --tn-border-hi: #3b4261;
+      --tn-fg: #c0caf5;
+      --tn-fg-bright: #ffffff;
+      --tn-fg-muted: #787c99;
+      --tn-fg-sub: #a9b1d6;
+      --tn-accent: #ffffff;
+      --tn-accent-hover: #e5e9f5;
+      --tn-accent-fg: #16161e;
+      --tn-online: #7aa2f7;
+    }
+
+    html[data-theme="dark"] {
+      --tn-bg: #191b1d;
+      --tn-bg-dark: #232527;
+      --tn-surface: #232527;
+      --tn-surface-hi: #2b2d2f;
+      --tn-input: #111214;
+      --tn-border: #393b3d;
+      --tn-border-hi: #494d50;
+      --tn-fg: #d0d2d4;
+      --tn-fg-bright: #ffffff;
+      --tn-fg-muted: #8c8f93;
+      --tn-fg-sub: #b8babc;
+      --tn-accent: #ffffff;
+      --tn-accent-hover: #e2e4e6;
+      --tn-accent-fg: #191b1d;
+      --tn-online: #00a2ff;
+    }
+
+    html[data-theme="light"] {
+      --tn-bg: #f2f4f5;
+      --tn-bg-dark: #ffffff;
+      --tn-surface: #ffffff;
+      --tn-surface-hi: #e6e8ea;
+      --tn-input: #edeff1;
+      --tn-border: #d9dcdf;
+      --tn-border-hi: #bfc4c9;
+      --tn-fg: #393b3d;
+      --tn-fg-bright: #191b1d;
+      --tn-fg-muted: #696b6e;
+      --tn-fg-sub: #545658;
+      --tn-accent: #191b1d;
+      --tn-accent-hover: #323538;
+      --tn-accent-fg: #ffffff;
+      --tn-online: #0074bd;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: "Builder Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+
+    html,
+    body {
+      margin: 0;
+      height: 100%;
+      background: var(--tn-bg);
+      color: var(--tn-fg);
+      font-family: "Builder Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      overflow: hidden;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button,
+    input,
+    textarea {
+      font-family: inherit;
+    }
+
+    #canvas {
+      width: 100vw;
+      height: 100vh;
+      display: block;
+      outline: none;
+    }
+
+    #input-container {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 0;
+      height: 0;
+      overflow: hidden;
+    }
+
+    #input-input,
+    #input-textarea {
+      position: absolute;
+      opacity: 0;
+    }
+
+    #hud {
+      display: none !important;
+    }
+
+    /* =======================================================================
+     SHELL & TOP NAVIGATION BAR
+     ======================================================================= */
+    #rbx-shell {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      display: flex;
+      flex-direction: column;
+      background: var(--tn-bg);
+      color: var(--tn-fg);
+    }
+
+    #rbx-topbar {
+      height: 54px;
+      min-height: 54px;
+      background: var(--tn-bg-dark);
+      border-bottom: 1px solid var(--tn-border);
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      padding: 0 20px;
+      gap: 14px;
+      z-index: 65;
+    }
+
+    .rbx-top-left {
+      display: flex;
+      align-items: center;
+      justify-self: start;
+    }
+
+    .rbx-logo-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: 36px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: var(--tn-fg-bright);
+      padding: 0 4px;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+    }
+
+    /* Balanced Search Bar */
+    .rbx-search-container {
+      width: 200%;
+      max-width: 1037px;
+      justify-self: right;
+    }
+
+    .rbx-search-box {
+      display: flex;
+      align-items: center;
+      height: 38px;
+      background: var(--tn-input);
+      border: 1px solid var(--tn-border-hi);
+      border-radius: 8px;
+      padding: 0 14px;
+      gap: 10px;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .rbx-search-box:focus-within {
+      border-color: var(--tn-accent);
+      background: var(--tn-bg-dark);
+    }
+
+    .rbx-search-box input {
+      flex: 1;
+      min-width: 0;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--tn-fg-bright);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .rbx-search-box input::placeholder {
+      color: var(--tn-fg-muted);
+    }
+
+    .rbx-search-clear {
+      background: transparent;
+      border: none;
+      color: var(--tn-fg-muted);
+      cursor: pointer;
+      display: none;
+      padding: 2px;
+      line-height: 1;
+    }
+
+    .rbx-search-clear:hover {
+      color: var(--tn-fg-bright);
+    }
+
+    /* Top Right Profile & Settings Gear */
+    .rbx-top-right {
+      display: flex;
+      align-items: center;
+      justify-self: end;
+      gap: 10px;
+      position: relative;
+    }
+
+    .rbx-top-user {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 4px 6px;
+      border-radius: 8px;
+      cursor: default;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--tn-fg-bright);
+    }
+
+    .rbx-top-user img {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--tn-surface-hi);
+      object-fit: cover;
+    }
+
+    .rbx-age-tag {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--tn-fg-sub);
+      background: var(--tn-surface-hi);
+      border: 1px solid var(--tn-border);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .rbx-icon-btn {
+      background: transparent;
+      border: none;
+      color: var(--tn-fg-bright);
+      height: 36px;
+      width: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+
+    .rbx-icon-btn:hover {
+      background: var(--tn-surface-hi);
+    }
+
+    /* Settings Dropdown Menu (Switch Account + Themes) */
+    #rbx-settings-menu {
+      position: absolute;
+      top: 46px;
+      right: 0;
+      width: 215px;
+      background: var(--tn-surface);
+      border: 1px solid var(--tn-border-hi);
+      border-radius: 10px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
+      padding: 6px 0;
+      display: none;
+      flex-direction: column;
+      z-index: 120;
+    }
+
+    .rbx-menu-label {
+      padding: 6px 14px 4px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--tn-fg-muted);
+    }
+
+    .rbx-menu-item {
+      background: transparent;
+      border: none;
+      color: var(--tn-fg-bright);
+      text-align: left;
+      padding: 9px 14px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .rbx-menu-item:hover {
+      background: var(--tn-surface-hi);
+    }
+
+    .rbx-menu-item.active-theme::after {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--tn-accent);
+    }
+
+    .rbx-menu-divider {
+      height: 1px;
+      background: var(--tn-border);
+      margin: 5px 0;
+    }
+
+    /* =======================================================================
+     BODY: LEFT SIDEBAR + MAIN VIEWPORT
+     ======================================================================= */
+    #rbx-body {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    #rbx-sidebar {
+      width: 184px;
+      min-width: 184px;
+      background: var(--tn-bg-dark);
+      border-right: 1px solid var(--tn-border);
+      display: flex;
+      flex-direction: column;
+      padding: 12px 0;
+      overflow-y: auto;
+    }
+
+    #rbx-sidebar::-webkit-scrollbar {
+      width: 0;
+    }
+
+    .rbx-side-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px 14px;
+      border-bottom: 1px solid var(--tn-border);
+      margin-bottom: 6px;
+      cursor: default;
+    }
+
+    .rbx-side-profile img {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--tn-surface-hi);
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .rbx-side-profile span {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--tn-fg-bright);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .rbx-side-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 18px;
+      background: transparent;
+      border: none;
+      color: var(--tn-fg-sub);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+      position: relative;
+      transition: background 0.12s, color 0.12s;
+    }
+
+    .rbx-side-item:hover,
+    .rbx-side-item.active {
+      color: var(--tn-fg-bright);
+      background: var(--tn-surface);
+    }
+
+    .rbx-side-item.active::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 7px;
+      bottom: 7px;
+      width: 3px;
+      background: var(--tn-accent);
+      border-radius: 0 2px 2px 0;
+    }
+
+    .rbx-side-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .rbx-side-badge {
+      margin-left: auto;
+      font-size: 12px;
+      font-weight: 700;
+      background: var(--tn-surface-hi);
+      color: var(--tn-fg-bright);
+      padding: 2px 7px;
+      border-radius: 99px;
+    }
+
+    /* Main Scrollable Content */
+    #rbx-main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 28px 36px 72px;
+      background: var(--tn-bg);
+    }
+
+    #rbx-main::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    #rbx-main::-webkit-scrollbar-thumb {
+      background: var(--tn-border-hi);
+      border-radius: 4px;
+    }
+
+    .rbx-page-title {
+      font-size: 30px;
+      font-weight: 800;
+      margin: 0 0 24px;
+      color: var(--tn-fg-bright);
+      letter-spacing: -0.2px;
+    }
+
+    .rbx-row-section {
+      margin-bottom: 34px;
+    }
+
+    .rbx-row-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .rbx-row-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--tn-fg-bright);
+      margin: 0;
+    }
+
+    .rbx-see-all {
+      background: transparent;
+      border: none;
+      color: var(--tn-fg-sub);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+
+    .rbx-see-all:hover {
+      color: var(--tn-fg-bright);
+      background: var(--tn-surface);
+    }
+
+    /* =======================================================================
+     HOME: FRIENDS ROW (EXACTLY 9 FRIENDS AT A TIME)
+     ======================================================================= */
+    .rbx-friends-strip {
+      display: grid;
+      grid-template-columns: repeat(9, minmax(0, 1fr));
+      gap: 18px;
+      padding-bottom: 4px;
+    }
+
+    .rbx-friend-tile {
+      width: 100%;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .rbx-friend-avatar-wrap {
+      position: relative;
+      width: 96px;
+      height: 96px;
+      max-width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 50%;
+      background: var(--tn-surface);
+      margin-bottom: 8px;
+      border: 1px solid var(--tn-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.14s ease;
+    }
+
+    .rbx-friend-tile:hover .rbx-friend-avatar-wrap {
+      transform: translateY(-2px);
+    }
+
+    .rbx-friend-avatar-wrap img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .rbx-presence-dot {
+      position: absolute;
+      right: 2px;
+      bottom: 2px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 3px solid var(--tn-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .rbx-presence-online {
+      background: var(--tn-online);
+    }
+
+    .rbx-presence-ingame {
+      background: var(--tn-accent);
+    }
+
+    .rbx-presence-offline {
+      display: none;
+    }
+
+    .rbx-friend-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--tn-fg-bright);
+      width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      line-height: 1.3;
+    }
+
+    .rbx-friend-handle-sub {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--tn-fg-muted);
+      width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .rbx-friend-game {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--tn-fg-bright);
+      width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      margin-top: 2px;
+    }
+
+    /* =======================================================================
+     EXPERIENCE TILES & 16:9 RECOMMENDED CARDS
+     ======================================================================= */
+    .rbx-carousel-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(158px, 1fr));
+      gap: 18px;
+    }
+
+    /* Single 7-column row for Continue (no second bar) */
+    #home-continue-row {
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+    }
+
+    .rbx-exp-tile {
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .rbx-exp-thumb {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 8px;
+      background: var(--tn-surface);
+      border: 1px solid var(--tn-border);
+      overflow: hidden;
+      margin-bottom: 8px;
+      position: relative;
+    }
+
+    .rbx-exp-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.16s ease;
+    }
+
+    .rbx-exp-tile:hover .rbx-exp-thumb img {
+      transform: scale(1.04);
+    }
+
+    .rbx-exp-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--tn-fg-bright);
+      line-height: 1.25;
+      margin-bottom: 5px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .rbx-exp-stats {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--tn-fg-sub);
+      font-weight: 600;
+    }
+
+    .rbx-stat-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .rbx-stat-item svg {
+      width: 13px;
+      height: 13px;
+      fill: var(--tn-fg-sub);
+      flex-shrink: 0;
+    }
+
+    /* 16:9 Recommended For You Grid */
+    .rbx-rec-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 20px;
+    }
+
+    .rbx-rec-card {
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+    }
+
+    .rbx-rec-banner {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: 8px;
+      background: var(--tn-surface);
+      border: 1px solid var(--tn-border);
+      overflow: hidden;
+      margin-bottom: 10px;
+      position: relative;
+    }
+
+    .rbx-rec-banner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.16s ease;
+    }
+
+    .rbx-rec-card:hover .rbx-rec-banner img {
+      transform: scale(1.03);
+    }
+
+    .rbx-rec-foot {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .rbx-rec-mini-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+      background: var(--tn-surface);
+      border: 1px solid var(--tn-border);
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .rbx-rec-meta {
+      flex: 1;
+      min-width: 0;
+    }
+
+    /* =======================================================================
+     FRIENDS PAGE
+     ======================================================================= */
+    .rbx-friends-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--tn-border);
+      margin-bottom: 22px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .rbx-subtabs {
+      display: flex;
+      gap: 28px;
+    }
+
+    .rbx-subtab {
+      background: transparent;
+      border: none;
+      color: var(--tn-fg-muted);
+      font-size: 15px;
+      font-weight: 700;
+      padding: 12px 4px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+
+    .rbx-subtab.active {
+      color: var(--tn-fg-bright);
+      border-bottom-color: var(--tn-accent);
+    }
+
+    .rbx-friend-filter-input {
+      height: 36px;
+      width: 260px;
+      background: var(--tn-input);
+      border: 1px solid var(--tn-border-hi);
+      border-radius: 8px;
+      padding: 0 12px;
+      color: var(--tn-fg-bright);
+      font-size: 14px;
+      outline: none;
+      margin-bottom: 6px;
+    }
+
+    .rbx-friend-filter-input:focus {
+      border-color: var(--tn-accent);
+    }
+
+    .rbx-friends-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+    }
+
+    .rbx-friend-card {
+      background: var(--tn-surface);
+      border: 1px solid var(--tn-border);
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .rbx-friend-card-avatar {
+      position: relative;
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      background: var(--tn-bg-dark);
+      flex-shrink: 0;
+    }
+
+    .rbx-friend-card-avatar img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .rbx-friend-card-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .rbx-friend-card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--tn-fg-bright);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .rbx-friend-card-handle {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--tn-fg-muted);
+      margin-top: 2px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .rbx-friend-card-status {
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 6px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .rbx-friend-join-btn {
+      background: var(--tn-accent);
+      color: var(--tn-accent-fg);
+      border: none;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .rbx-friend-join-btn:hover {
+      background: var(--tn-accent-hover);
+    }
+
+    /* =======================================================================
+     EXPERIENCE DETAIL PAGE
+     ======================================================================= */
+    #view-game-detail {
+      display: none;
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    .rbx-detail-hero {
+      display: grid;
+      grid-template-columns: minmax(0, 640px) 316px;
+      gap: 24px;
+      align-items: stretch;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 960px) {
+      .rbx-detail-hero {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .rbx-detail-media {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: var(--tn-surface);
+      border: 1px solid var(--tn-border);
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .rbx-detail-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .rbx-detail-panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 4px 0;
+    }
+
+    .rbx-detail-head-group {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .rbx-detail-icon-sm {
+      width: 64px;
+      height: 64px;
+      border-radius: 10px;
+      background: var(--tn-surface);
+      border: 1px solid var(--tn-border);
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .rbx-detail-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--tn-fg-bright);
+      margin: 0 0 6px;
+      line-height: 1.18;
+    }
+
+    .rbx-detail-creator {
+      font-size: 14px;
+      color: var(--tn-fg-sub);
+      font-weight: 600;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .rbx-detail-creator span.creator-name {
+      color: var(--tn-fg-bright);
+    }
+
+    .rbx-verified-check {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: var(--tn-accent);
+      color: var(--tn-accent-fg);
+    }
+
+    .rbx-detail-maturity {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--tn-fg-sub);
+      background: var(--tn-surface);
+      border: 1px solid var(--tn-border);
+      border-radius: 6px;
+      padding: 6px 10px;
+      margin-bottom: 12px;
+    }
+
+    .rbx-detail-quick-card {
+      background: var(--tn-surface);
+      border: 1px solid var(--tn-border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .rbx-detail-quick-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      text-align: center;
+    }
+
+    .rbx-detail-quick-stat {
+      background: var(--tn-bg-dark);
+      border: 1px solid var(--tn-border);
+      border-radius: 6px;
+      padding: 7px 6px;
+    }
+
+    .rbx-detail-quick-val {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--tn-fg-bright);
+      line-height: 1.2;
+    }
+
+    .rbx-detail-quick-lbl {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--tn-fg-muted);
+      margin-top: 2px;
+    }
+
+    .rbx-detail-quick-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .rbx-detail-quick-tag {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--tn-fg-sub);
+      background: var(--tn-bg-dark);
+      border: 1px solid var(--tn-border);
+      border-radius: 5px;
+      padding: 3px 8px;
+    }
+
+    .rbx-detail-play-btn {
+      width: 100%;
+      height: 54px;
+      background: var(--tn-accent);
+      color: var(--tn-accent-fg);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.14s;
+    }
+
+    .rbx-detail-play-btn:hover {
+      background: var(--tn-accent-hover);
+    }
+
+    .rbx-detail-play-btn svg {
+      fill: var(--tn-accent-fg);
+    }
+
+    /* Game Page Tabs */
+    .rbx-game-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      background: var(--tn-surface);
+      border-bottom: 1px solid var(--tn-border);
+      border-radius: 8px 8px 0 0;
+      margin-bottom: 20px;
+    }
+
+    .rbx-game-tab {
+      background: transparent;
+      border: none;
+      color: var(--tn-fg-muted);
+      font-size: 15px;
+      font-weight: 700;
+      padding: 14px 0;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      text-align: center;
+    }
+
+    .rbx-game-tab.active {
+      color: var(--tn-fg-bright);
+      border-bottom-color: var(--tn-accent);
+    }
+
+    .rbx-detail-section {
+      background: var(--tn-surface);
+      border: 1px solid var(--tn-border);
+      border-radius: 8px;
+      padding: 22px 24px;
+      margin-bottom: 28px;
+    }
+
+    .rbx-detail-section-title {
+      margin: 0 0 12px;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--tn-fg-bright);
+    }
+
+    .rbx-detail-desc {
+      font-size: 15px;
+      color: var(--tn-fg);
+      line-height: 1.6;
+      white-space: pre-line;
+    }
+
+    .rbx-stats-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(115px, 1fr));
+      gap: 16px;
+      border-top: 1px solid var(--tn-border);
+      padding-top: 18px;
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .rbx-stat-col-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--tn-fg-muted);
+      margin-bottom: 5px;
+    }
+
+    .rbx-stat-col-val {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--tn-fg-bright);
+    }
+
+    .rbx-btn-secondary {
+      background: var(--tn-surface-hi);
+      color: var(--tn-fg-bright);
+      border: 1px solid var(--tn-border-hi);
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .rbx-btn-white {
+      background: var(--tn-accent);
+      color: var(--tn-accent-fg);
+      border: none;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="canvas"></canvas>
+  <div id="hud"></div>
+  <div id="input-container"><textarea id="input-textarea"></textarea><input id="input-input"></div>
+
+  <!-- ROBLOX SHELL -->
+  <div id="rbx-shell">
+    <!-- Top Header -->
+    <header id="rbx-topbar">
+      <div class="rbx-top-left">
+        <button class="rbx-logo-btn" id="rbx-brand-home" title="Insomniac">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+          <span>Insomniac</span>
+        </button>
+      </div>
+
+      <div class="rbx-search-container">
+        <div class="rbx-search-box">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+            style="opacity:0.6">
+            <circle cx="11" cy="11" r="7"></circle>
+            <line x1="20" y1="20" x2="16.2" y2="16.2"></line>
+          </svg>
+          <input id="rbx-search-input" type="text" placeholder="Search" />
+          <button class="rbx-search-clear" id="rbx-search-clear" title="Clear">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="rbx-top-right">
+        <div class="rbx-top-user" id="rbx-top-user" style="display:none">
+          <img id="rbx-top-avatar" alt="" />
+          <span id="rbx-top-username">Player</span>
+          <span class="rbx-age-tag">13+</span>
+        </div>
+
+        <button class="rbx-btn-white" id="rbx-login-switch-btn" style="display:none">Log In</button>
+        <button class="rbx-btn-secondary" id="rbx-signup-switch-btn" style="display:none">Sign Up</button>
+
+        <!-- Settings Gear -->
+        <button class="rbx-icon-btn" id="rbx-settings-btn" title="Settings">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.77 1.02 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z">
+            </path>
+          </svg>
+        </button>
+
+        <div id="rbx-settings-menu">
+          <div class="rbx-menu-label">Account</div>
+          <button class="rbx-menu-item" id="menu-switch-account">Switch Account</button>
+          <div class="rbx-menu-divider"></div>
+          <div class="rbx-menu-label">Theme</div>
+          <button class="rbx-menu-item" data-theme-pick="tokyo-night">Tokyo Night</button>
+          <button class="rbx-menu-item" data-theme-pick="dark">Dark</button>
+          <button class="rbx-menu-item" data-theme-pick="light">Light</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Body: Sidebar + Main -->
+    <div id="rbx-body">
+      <aside id="rbx-sidebar">
+        <div class="rbx-side-profile" id="rbx-side-profile">
+          <img id="rbx-side-avatar" alt="" />
+          <span id="rbx-side-username">Player</span>
+        </div>
+
+        <button class="rbx-side-item active" data-side="home">
+          <span class="rbx-side-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1v-9.5z" />
+            </svg>
+          </span>
+          <span>Home</span>
+        </button>
+
+        <button class="rbx-side-item" data-side="friends">
+          <span class="rbx-side-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+          </span>
+          <span>Friends</span>
+          <span class="rbx-side-badge" id="rbx-side-friend-count">0</span>
+        </button>
+
+        <button class="rbx-side-item" data-side="charts">
+          <span class="rbx-side-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="12" width="4" height="8" rx="1" />
+              <rect x="10" y="8" width="4" height="12" rx="1" />
+              <rect x="17" y="4" width="4" height="16" rx="1" />
+            </svg>
+          </span>
+          <span>Charts</span>
+        </button>
+      </aside>
+
+      <main id="rbx-main">
+        <!-- ==================== VIEW 1: HOME ==================== -->
+        <div id="view-home">
+          <h1 class="rbx-page-title">Home</h1>
+
+          <!-- Friends Row (Shows 9 Friends) -->
+          <section class="rbx-row-section">
+            <div class="rbx-row-header">
+              <h2 class="rbx-row-title" id="home-friends-heading">Friends (0)</h2>
+              <button class="rbx-see-all" id="home-friends-seeall">
+                <span>See All</span>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+            </div>
+            <div class="rbx-friends-strip" id="home-friends-strip"></div>
+          </section>
+
+          <!-- Continue Row (Single row of 7 places) -->
+          <section class="rbx-row-section">
+            <div class="rbx-row-header">
+              <h2 class="rbx-row-title">Continue</h2>
+              <button class="rbx-see-all" id="home-continue-seeall">
+                <span>See All</span>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+            </div>
+            <div class="rbx-carousel-row" id="home-continue-row"></div>
+          </section>
+
+          <!-- Recommended For You (16:9 Cards) -->
+          <section class="rbx-row-section">
+            <div class="rbx-row-header">
+              <h2 class="rbx-row-title">Recommended For You</h2>
+            </div>
+            <div class="rbx-rec-grid" id="home-recommended-grid"></div>
+          </section>
+
+          <!-- Favorites Row -->
+          <section class="rbx-row-section">
+            <div class="rbx-row-header">
+              <h2 class="rbx-row-title">Favorites</h2>
+              <button class="rbx-see-all" id="home-favorites-seeall">
+                <span>See All</span>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+            </div>
+            <div class="rbx-carousel-row" id="home-classics-row"></div>
+          </section>
+        </div>
+
+        <!-- ==================== VIEW 2: FRIENDS ==================== -->
+        <div id="view-friends" style="display:none">
+          <h1 class="rbx-page-title" id="friends-page-title">My Friends</h1>
+          <div class="rbx-friends-toolbar">
+            <div class="rbx-subtabs" id="friends-filter-tabs">
+              <button class="rbx-subtab active" data-ffilter="all">All Friends</button>
+              <button class="rbx-subtab" data-ffilter="online">Online</button>
+              <button class="rbx-subtab" data-ffilter="ingame">In-Experience</button>
+            </div>
+            <input class="rbx-friend-filter-input" id="friends-search-input" type="text" placeholder="Search" />
+          </div>
+          <div class="rbx-friends-grid" id="friends-full-grid"></div>
+        </div>
+
+        <!-- ==================== VIEW 3: CHARTS ==================== -->
+        <div id="view-charts" style="display:none">
+          <h1 class="rbx-page-title" id="charts-page-title">Charts</h1>
+
+          <section class="rbx-row-section">
+            <div class="rbx-row-header">
+              <h2 class="rbx-row-title">Top Trending</h2>
+            </div>
+            <div class="rbx-carousel-row" id="charts-trending-row"></div>
+          </section>
+
+          <section class="rbx-row-section">
+            <div class="rbx-row-header">
+              <h2 class="rbx-row-title">Top Playing Now</h2>
+            </div>
+            <div class="rbx-carousel-row" id="charts-engaging-row"></div>
+          </section>
+
+          <section class="rbx-row-section">
+            <div class="rbx-row-header">
+              <h2 class="rbx-row-title">Up-and-Coming</h2>
+            </div>
+            <div class="rbx-carousel-row" id="charts-classics-row"></div>
+          </section>
+        </div>
+
+        <!-- ==================== VIEW 3B: COLLECTION (CONTINUE / FAVORITES SEE ALL) ==================== -->
+        <div id="view-collection" style="display:none">
+          <div class="rbx-row-header" style="margin-bottom:22px;">
+            <h1 class="rbx-page-title" id="collection-page-title" style="margin:0;">Continue</h1>
+            <button class="rbx-btn-secondary" id="collection-back-btn">Back to Home</button>
+          </div>
+          <div class="rbx-carousel-row" id="collection-grid"></div>
+        </div>
+
+        <!-- ==================== VIEW 3C: SEARCH RESULTS ==================== -->
+        <div id="view-search" style="display:none">
+          <div class="rbx-row-header" style="margin-bottom:22px;">
+            <h1 class="rbx-page-title" id="search-page-title" style="margin:0;">Search Results</h1>
+            <button class="rbx-btn-secondary" id="search-back-btn">Back to Home</button>
+          </div>
+          <div class="rbx-carousel-row" id="search-results-row"></div>
+        </div>
+
+        <!-- ==================== VIEW 4: EXPERIENCE DETAIL ==================== -->
+        <div id="view-game-detail">
+          <div class="rbx-detail-hero">
+            <div class="rbx-detail-media">
+              <img id="detail-banner-img" alt="" />
+            </div>
+            <div class="rbx-detail-panel">
+              <div>
+                <div class="rbx-detail-head-group">
+                  <img class="rbx-detail-icon-sm" id="detail-icon-sm" alt="" />
+                  <div>
+                    <h1 class="rbx-detail-title" id="detail-title">Experience</h1>
+                    <div class="rbx-detail-creator">
+                      <span>By</span>
+                      <span class="creator-name" id="detail-creator">Roblox</span>
+                      <span class="rbx-verified-check" title="Verified">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="3">
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="rbx-detail-maturity">Maturity: Minimal &bull; All Ages</div>
+              </div>
+
+              <div class="rbx-detail-quick-card">
+                <div class="rbx-detail-quick-grid">
+                  <div class="rbx-detail-quick-stat">
+                    <div class="rbx-detail-quick-val" id="detail-hero-playing">0</div>
+                    <div class="rbx-detail-quick-lbl">Active</div>
+                  </div>
+                  <div class="rbx-detail-quick-stat">
+                    <div class="rbx-detail-quick-val" id="detail-hero-rating">90%</div>
+                    <div class="rbx-detail-quick-lbl">Rating</div>
+                  </div>
+                  <div class="rbx-detail-quick-stat">
+                    <div class="rbx-detail-quick-val" id="detail-hero-visits">—</div>
+                    <div class="rbx-detail-quick-lbl">Visits</div>
+                  </div>
+                </div>
+                <div class="rbx-detail-quick-tags">
+                  <span class="rbx-detail-quick-tag" id="detail-hero-genre">Genre: All</span>
+                  <span class="rbx-detail-quick-tag" id="detail-hero-server">Server: 50 Max</span>
+                </div>
+              </div>
+
+              <div>
+                <button class="rbx-detail-play-btn" id="detail-play-btn" title="Play">
+                  <svg width="28" height="28" viewBox="0 0 24 24">
+                    <polygon points="7,4 20,12 7,20"></polygon>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="rbx-game-tabs">
+            <button class="rbx-game-tab active">About</button>
+            <button class="rbx-game-tab">Store</button>
+            <button class="rbx-game-tab">Servers</button>
+          </div>
+
+          <div class="rbx-detail-section">
+            <h3 class="rbx-detail-section-title">Description</h3>
+            <div class="rbx-detail-desc" id="detail-desc"></div>
+
+            <div class="rbx-stats-strip">
+              <div>
+                <div class="rbx-stat-col-label">Active</div>
+                <div class="rbx-stat-col-val" id="detail-stat-active">0</div>
+              </div>
+              <div>
+                <div class="rbx-stat-col-label">Favorites</div>
+                <div class="rbx-stat-col-val" id="detail-stat-favs">—</div>
+              </div>
+              <div>
+                <div class="rbx-stat-col-label">Visits</div>
+                <div class="rbx-stat-col-val" id="detail-stat-visits">—</div>
+              </div>
+              <div>
+                <div class="rbx-stat-col-label">Created</div>
+                <div class="rbx-stat-col-val" id="detail-stat-created">—</div>
+              </div>
+              <div>
+                <div class="rbx-stat-col-label">Updated</div>
+                <div class="rbx-stat-col-val" id="detail-stat-updated">—</div>
+              </div>
+              <div>
+                <div class="rbx-stat-col-label">Server Size</div>
+                <div class="rbx-stat-col-val" id="detail-stat-maxplayers">50</div>
+              </div>
+              <div>
+                <div class="rbx-stat-col-label">Genre</div>
+                <div class="rbx-stat-col-val" id="detail-stat-genre">All</div>
+              </div>
+            </div>
+          </div>
+
+          <section class="rbx-row-section">
+            <div class="rbx-row-header">
+              <h2 class="rbx-row-title">Recommended Experiences</h2>
+            </div>
+            <div class="rbx-carousel-row" id="detail-recommended-row"></div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- elements the loader touches; hidden, never used by us -->
+  <div id="loading-overlay" style="display:none">
+    <div id="loading-icon-shell"></div>
+    <div id="loading-background-image"></div>
+    <div id="loading-experience-title"></div>
+    <div id="loading-experience-creator"></div>
+    <img id="loading-experience-icon" alt="">
+    <span id="loading-verified-badge"></span>
+    <button id="loading-cancel">cancel</button>
+    <div id="loading-error-title"></div>
+    <div id="loading-error-message"></div>
+    <div id="loading-error-code"></div>
+    <button id="loading-error-leave">leave</button>
+  </div>
+  <div id="status" style="display:none"></div>
+  <div id="server" style="display:none"></div>
+  <div id="proxyenabled" style="display:none"></div>
+
+  <script src="/boot.js"></script>
+  <script src="/abi.js"></script>
+  <script src="/rbx-net.js"></script>
+  <script src="/rupp.js"></script>
+  <script src="/ring.js"></script>
+  <script src="/auth.js"></script>
+  <script src="/app.js"></script>
+</body>
+
+</html>

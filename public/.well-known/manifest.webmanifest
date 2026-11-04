@@ -1,0 +1,23 @@
+{
+  "name": "Weblox",
+  "short_name": "Weblox",
+  "description": "Roblox web client over RakNet.",
+  "version": "0.2.0",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "icons": [
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ],
+  "permissions_policy": {
+    "cross-origin-isolated": ["self"],
+    "direct-sockets": ["self"],
+    "controlled-frame": ["self"],
+    "fullscreen": ["self"],
+    "gamepad": ["self"],
+    "screen-wake-lock": ["self"],
+    "autoplay": ["self"]
+  }
+}
