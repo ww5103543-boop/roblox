@@ -81,10 +81,11 @@
       return snapshot();
     }
 
-    // Standard browser tab / website mode: connect via rkhost.py WebSocket UDP bridge
+    // Standard browser tab / website mode: connect via server.py WebSocket UDP bridge
     const proto = location.protocol === "https:" ? "wss:" : "ws:";
     const wsUrl = `${proto}//${location.host}/__udp?host=${encodeURIComponent(host)}&port=${Number(port)}`;
-    await new Promise((resolve, reject) => {
+
+    const connectWs = () => new Promise((resolve, reject) => {
       const sock = new WebSocket(wsUrl);
       sock.binaryType = "arraybuffer";
       let settled = false;
@@ -97,7 +98,7 @@
         log(`WS-UDP open -> ${host}:${port}`);
         if (!settled) {
           settled = true;
-          resolve();
+          resolve(sock);
         }
       };
 
@@ -110,20 +111,34 @@
 
       sock.onerror = (e) => {
         stats.errors++;
+        console.warn("[ring] WS connection error:", e);
         if (!settled) {
           settled = true;
           reject(new Error("WebSocket UDP relay failed to connect"));
         }
       };
 
-      sock.onclose = () => {
+      sock.onclose = (ev) => {
         if (ws === sock) {
           running = false;
           ws = null;
-          log("WS-UDP socket closed");
+          log(`WS-UDP socket closed (code=${ev.code})`);
         }
       };
     });
+
+    let lastErr = null;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        await connectWs();
+        lastErr = null;
+        break;
+      } catch (err) {
+        lastErr = err;
+        if (attempt < 3) await new Promise((r) => setTimeout(r, 200 * attempt));
+      }
+    }
+    if (lastErr) throw lastErr;
 
     return snapshot();
   }

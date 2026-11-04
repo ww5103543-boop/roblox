@@ -310,6 +310,40 @@ def perform_gamejoin(place_id: int, session: ClientSession) -> dict:
         except Exception:
             pass
 
+def ws_read_frame(rfile) -> tuple[int, bytes]:
+    hdr = rfile.read(2)
+    if not hdr or len(hdr) < 2:
+        return 0x08, b""
+    opcode = hdr[0] & 0x0F
+    masked = (hdr[1] & 0x80) != 0
+    length = hdr[1] & 0x7F
+    if length == 126:
+        raw_len = rfile.read(2)
+        if len(raw_len) < 2:
+            return 0x08, b""
+        length = struct.unpack(">H", raw_len)[0]
+    elif length == 127:
+        raw_len = rfile.read(8)
+        if len(raw_len) < 8:
+            return 0x08, b""
+        length = struct.unpack(">Q", raw_len)[0]
+    mask = rfile.read(4) if masked else b""
+    payload = rfile.read(length) if length else b""
+    if masked and payload and mask:
+        payload = bytes(b ^ mask[i & 3] for i, b in enumerate(payload))
+    return opcode, payload
+
+
+def ws_build_frame(data: bytes, opcode: int = 0x02) -> bytes:
+    n = len(data)
+    first = 0x80 | (opcode & 0x0F)
+    if n < 126:
+        return bytes((first, n)) + data
+    if n < 65536:
+        return struct.pack(">BBH", first, 126, n) + data
+    return struct.pack(">BBQ", first, 127, n) + data
+
+
 # ---------------------------------------------------------------------------
 # HTTP & WebSocket Handler
 # ---------------------------------------------------------------------------
@@ -562,113 +596,70 @@ class InsomniacHandler(BaseHTTPRequestHandler):
             self._respond(400, "text/plain", b"bad websocket request", False)
             return
 
-        magic = b"258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
-        accept = base64.b64encode(hashlib.sha1(ws_key.encode("ascii") + magic).digest()).decode("ascii")
-
-        self.send_response(101)
-        self.send_header("Upgrade", "websocket")
-        self.send_header("Connection", "Upgrade")
-        self.send_header("Sec-WebSocket-Accept", accept)
-        self.send_header("Sec-WebSocket-Protocol", "binary")
-        self.end_headers()
-
+        self.close_connection = True
         try:
             self.connection.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         except Exception:
             pass
 
         udp_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        udp_sock.settimeout(0.005)
         try:
+            udp_sock.bind(("0.0.0.0", 0))
             udp_sock.connect((host, port))
+            local_port = udp_sock.getsockname()[1]
         except Exception as e:
-            sys.stderr.write(f"[udp-ws] connect to {host}:{port} failed: {e}\n")
             udp_sock.close()
+            self._respond(500, "text/plain", str(e).encode("utf-8"), False)
             return
 
+        magic = b"258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
+        accept = base64.b64encode(
+            hashlib.sha1((ws_key.strip().encode("ascii") + magic)).digest()
+        ).decode("ascii")
+
+        handshake = (
+            "HTTP/1.1 101 Switching Protocols\r\n"
+            "Upgrade: websocket\r\n"
+            "Connection: Upgrade\r\n"
+            f"Sec-WebSocket-Accept: {accept}\r\n"
+            f"X-Local-UDP-Port: {local_port}\r\n"
+            "\r\n"
+        ).encode("ascii")
+        self.connection.sendall(handshake)
+
+        conn = self.connection
         closed = threading.Event()
 
         def udp_to_ws():
             while not closed.is_set():
                 try:
-                    data = udp_sock.recv(4096)
-                except (socket.timeout, BlockingIOError):
+                    data = udp_sock.recv(65535)
+                    if not data:
+                        break
+                    conn.sendall(ws_build_frame(data, 0x02))
+                except ConnectionResetError:
                     continue
                 except OSError:
                     break
-                if not data:
-                    continue
-
-                ln = len(data)
-                if ln < 126:
-                    hdr = bytes([0x82, ln])
-                elif ln <= 0xFFFF:
-                    hdr = struct.pack(">BBH", 0x82, 126, ln)
-                else:
-                    hdr = struct.pack(">BBQ", 0x82, 127, ln)
-
-                try:
-                    self.wfile.write(hdr + data)
-                    self.wfile.flush()
                 except Exception:
                     break
-            closed.set()
 
-        t = threading.Thread(target=udp_to_ws, daemon=True)
-        t.start()
-
-        def read_exact(n: int) -> bytes | None:
-            buf = bytearray()
-            while len(buf) < n:
-                try:
-                    chunk = self.rfile.read(n - len(buf))
-                except Exception:
-                    return None
-                if not chunk:
-                    return None
-                buf.extend(chunk)
-            return bytes(buf)
+        rx_thread = threading.Thread(target=udp_to_ws, daemon=True)
+        rx_thread.start()
 
         try:
-            while not closed.is_set():
-                head = read_exact(2)
-                if not head:
+            while True:
+                opcode, payload = ws_read_frame(self.rfile)
+                if opcode == 0x08:  # CLOSE
                     break
-                b1, b2 = head[0], head[1]
-                opcode = b1 & 0x0F
-                masked = (b2 & 0x80) != 0
-                plen = b2 & 0x7F
-
-                if opcode == 0x8:  # CLOSE
-                    break
-                elif opcode == 0x9:  # PING
-                    body = read_exact(plen) if plen else b""
-                    mask = read_exact(4) if masked else None
-                    pong = bytes([0x8A, plen]) + (body or b"")
-                    self.wfile.write(pong)
-                    self.wfile.flush()
+                if opcode == 0x09:  # PING
+                    conn.sendall(ws_build_frame(payload, 0x0A))
                     continue
-
-                if plen == 126:
-                    ext = read_exact(2)
-                    if not ext:
-                        break
-                    plen = struct.unpack(">H", ext)[0]
-                elif plen == 127:
-                    ext = read_exact(8)
-                    if not ext:
-                        break
-                    plen = struct.unpack(">Q", ext)[0]
-
-                mask_key = read_exact(4) if masked else None
-                payload = read_exact(plen) if plen else b""
-                if payload and mask_key:
-                    m = mask_key
-                    payload = bytes(b ^ m[i & 3] for i, b in enumerate(payload))
-
-                if opcode in (0x2, 0x0) and payload:  # Binary frame
+                if opcode in (0x01, 0x02) and payload:  # Binary / Text frame
                     try:
                         udp_sock.send(payload)
+                    except ConnectionResetError:
+                        continue
                     except OSError:
                         pass
         except Exception:
