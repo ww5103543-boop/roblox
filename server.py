@@ -34,6 +34,11 @@ if not ROOT.is_dir():
     ROOT = Path(__file__).resolve().parent
 
 DEFAULT_COOKIE = (os.environ.get("ROBLOSECURITY") or os.environ.get("COOKIE") or "").strip()
+GUEST_COOKIE = (
+    "_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_"
+    "CAEQAhoGCAIQBBgBIhsKBGR1aWQSEzMxNjYzMDQ5OTA2NDcyOTQ3MzIiEgoFdW5hbWUSCXI2c2RpZmluZCISCgN1aWQSCzExOTM4OTM1MjA0KAM."
+    "7iMIuejHTvsI7333kDAn1o09ZGT2-p5RoOMcpu56MX71ndqJ72YH-BLgnoOAe_u7TPcw6NQQ7eNNUo0JuxvAr7X8hvFlD5z-3ghiYnIho65RGqnB10GNRrGOO_Msl2QcdnFMZjBCXJETCNbP8u6rxKr0jD_MaogUaiHfCs1KhQS-CdvgU_sejiFJsGAg8rcUvMGayGB3yJK6p-jYVCmRWKM6FxLv54l_udJLzVU4TU0VBVUwZjhQiQlCThj4xQ3ioip0XknQ1qLOIUBT9tkircUZlWPSGNcc87B5Ul3qhgjUQ6Q1UHSQ4c_xup8m2HQmqA3cKoLhyB0D_nLqLNvy7UIyxn4WtZ35DHYqvs3cSDMeMq8wFXiWb0jfECUXmyS-BoGYmG8lVuKD7irFDGZh6S1vnYLOYK3facNjUiJG9VmPKqpMMuDjeEvLMBIUJhvDF1KscImgWAvMR_WGJGqJ-QWabLjqknQfXXY7oGs_zJEk-OKMHnFjR9zwjC0jnPBclVstGn5lCI65zUcc-8JmIg2vdeRoE4vXuUnhMUKWXeYgxOQ2_arfFqqPrV8kdTmn3RFNOf1Tbm6cpZnk52knUw46XLTkNUEPOxnx01OKdzv4NFuOCUmDmzQ2sODWjLsRkCiP1x49Qe1ykDfWeEIs1dG0iscBqRXk9FbIAqte1PABkSJ-BKezRYzvreippEStrIlAZPnQKqBuaxv67hTf7HVmrsFEGp0f7ioTl7VIuQP9tHMY73j5n6W1pWbDcAqwP2kSvSblw9pBKI6_UVCAq_f1PALg2VoUTP4fm5WVkHXao0rz-pBIbvvibE0Npl9ivkrSMoPDF6vN56lT1J9pUAETcn2R-2p3LVf4HD7WYjOh3WVWxZV4aVgfctfF9IoG.5cjc1mkhyiV3Pz4qtzY2tLIugzU"
+)
 CLIENT_UA = "Roblox/WinInet"
 BROWSER_UA = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -622,6 +627,25 @@ class InsomniacHandler(BaseHTTPRequestHandler):
                 self._respond_json(200, res, is_new_sid=is_new, sid=sess.sid)
             except Exception as e:
                 self._respond_json(500, {"status": "Error", "error": str(e)}, is_new_sid=is_new, sid=sess.sid)
+            return
+
+        if parsed.path == "/api/rbx/guest":
+            status, _, _, data, new_csrf = rbx_http_call(
+                "https://users.roblox.com/v1/users/authenticated",
+                cookie=GUEST_COOKIE,
+            )
+            if status == 200:
+                try:
+                    u = json.loads(data.decode("utf-8"))
+                    user = {"id": u.get("id"), "name": u.get("name"), "displayName": u.get("displayName")}
+                    with sess.lock:
+                        sess.cookie = GUEST_COOKIE
+                        sess.csrf = new_csrf
+                    self._respond_json(200, {"ok": True, "user": user, "cookie": GUEST_COOKIE}, is_new_sid=True, sid=sess.sid)
+                    return
+                except Exception:
+                    pass
+            self._respond_json(400, {"ok": False, "error": "guest cookie rejected"}, is_new_sid=is_new, sid=sess.sid)
             return
 
         if parsed.path == "/api/rbx/cookie":
