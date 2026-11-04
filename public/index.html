@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-theme="tokyo-night">
+<html lang="en" data-theme="dark">
 
 <head>
   <meta charset="utf-8">
@@ -42,61 +42,76 @@
     }
 
     /* =======================================================================
-     THEME PALETTES: TOKYO NIGHT, DARK, LIGHT
+     THEME PALETTES: DARK (AUTOMATIC DEFAULT), TOKYO NIGHT, LIGHT
      ======================================================================= */
     :root,
+    html[data-theme="dark"] {
+      --tn-bg: #0b0c11;
+      --tn-bg-dark: #07070b;
+      --tn-surface: rgba(18, 20, 30, 0.72);
+      --tn-surface-solid: #12141f;
+      --tn-surface-hi: #1a1e2f;
+      --tn-surface-hover: #22273d;
+      --tn-input: #08090d;
+      --tn-border: rgba(255, 255, 255, 0.08);
+      --tn-border-hi: rgba(255, 255, 255, 0.16);
+      --tn-border-glow: rgba(99, 102, 241, 0.4);
+      --tn-fg: #cbd5e1;
+      --tn-fg-bright: #ffffff;
+      --tn-fg-muted: #64748b;
+      --tn-fg-sub: #94a3b8;
+      --tn-accent: #6366f1;
+      --tn-accent-hover: #4f46e5;
+      --tn-accent-glow: rgba(99, 102, 241, 0.4);
+      --tn-accent-fg: #ffffff;
+      --tn-online: #10b981;
+      --tn-ingame: #a855f7;
+    }
+
     html[data-theme="tokyo-night"] {
-      --tn-bg: #1a1b26;
-      --tn-bg-dark: #16161e;
-      --tn-surface: #1f2335;
-      --tn-surface-hi: #24283b;
-      --tn-input: #13141c;
-      --tn-border: #292e42;
-      --tn-border-hi: #3b4261;
+      --tn-bg: #13141f;
+      --tn-bg-dark: #0f1019;
+      --tn-surface: rgba(26, 27, 44, 0.75);
+      --tn-surface-solid: #1a1b2c;
+      --tn-surface-hi: #24263e;
+      --tn-surface-hover: #2d304e;
+      --tn-input: #0d0e17;
+      --tn-border: rgba(192, 202, 245, 0.1);
+      --tn-border-hi: rgba(192, 202, 245, 0.2);
+      --tn-border-glow: rgba(122, 162, 247, 0.4);
       --tn-fg: #c0caf5;
       --tn-fg-bright: #ffffff;
       --tn-fg-muted: #787c99;
       --tn-fg-sub: #a9b1d6;
-      --tn-accent: #ffffff;
-      --tn-accent-hover: #e5e9f5;
-      --tn-accent-fg: #16161e;
-      --tn-online: #7aa2f7;
-    }
-
-    html[data-theme="dark"] {
-      --tn-bg: #191b1d;
-      --tn-bg-dark: #232527;
-      --tn-surface: #232527;
-      --tn-surface-hi: #2b2d2f;
-      --tn-input: #111214;
-      --tn-border: #393b3d;
-      --tn-border-hi: #494d50;
-      --tn-fg: #d0d2d4;
-      --tn-fg-bright: #ffffff;
-      --tn-fg-muted: #8c8f93;
-      --tn-fg-sub: #b8babc;
-      --tn-accent: #ffffff;
-      --tn-accent-hover: #e2e4e6;
-      --tn-accent-fg: #191b1d;
-      --tn-online: #00a2ff;
+      --tn-accent: #7aa2f7;
+      --tn-accent-hover: #89b4fa;
+      --tn-accent-glow: rgba(122, 162, 247, 0.4);
+      --tn-accent-fg: #13141f;
+      --tn-online: #73daca;
+      --tn-ingame: #bb9af7;
     }
 
     html[data-theme="light"] {
-      --tn-bg: #f2f4f5;
+      --tn-bg: #f3f4f6;
       --tn-bg-dark: #ffffff;
-      --tn-surface: #ffffff;
-      --tn-surface-hi: #e6e8ea;
-      --tn-input: #edeff1;
-      --tn-border: #d9dcdf;
-      --tn-border-hi: #bfc4c9;
-      --tn-fg: #393b3d;
-      --tn-fg-bright: #191b1d;
-      --tn-fg-muted: #696b6e;
-      --tn-fg-sub: #545658;
-      --tn-accent: #191b1d;
-      --tn-accent-hover: #323538;
+      --tn-surface: rgba(255, 255, 255, 0.85);
+      --tn-surface-solid: #ffffff;
+      --tn-surface-hi: #e5e7eb;
+      --tn-surface-hover: #d1d5db;
+      --tn-input: #f9fafb;
+      --tn-border: #e5e7eb;
+      --tn-border-hi: #d1d5db;
+      --tn-border-glow: rgba(99, 102, 241, 0.3);
+      --tn-fg: #374151;
+      --tn-fg-bright: #111827;
+      --tn-fg-muted: #9ca3af;
+      --tn-fg-sub: #6b7280;
+      --tn-accent: #4f46e5;
+      --tn-accent-hover: #4338ca;
+      --tn-accent-glow: rgba(79, 70, 229, 0.25);
       --tn-accent-fg: #ffffff;
-      --tn-online: #0074bd;
+      --tn-online: #059669;
+      --tn-ingame: #7c3aed;
     }
 
     * {
@@ -157,20 +172,27 @@
       z-index: 40;
       display: flex;
       flex-direction: column;
-      background: var(--tn-bg);
+      background-color: var(--tn-bg);
+      background-image:
+        radial-gradient(circle at 10% 0%, rgba(99, 102, 241, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 90% 15%, rgba(56, 189, 248, 0.08) 0%, transparent 35%),
+        radial-gradient(circle at 50% 100%, rgba(139, 92, 246, 0.07) 0%, transparent 50%);
+      background-attachment: fixed;
       color: var(--tn-fg);
     }
 
     #rbx-topbar {
-      height: 54px;
-      min-height: 54px;
-      background: var(--tn-bg-dark);
+      height: 58px;
+      min-height: 58px;
+      background: rgba(11, 12, 17, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--tn-border);
       display: grid;
       grid-template-columns: auto 1fr auto;
       align-items: center;
-      padding: 0 20px;
-      gap: 14px;
+      padding: 0 24px;
+      gap: 20px;
       z-index: 65;
     }
 
@@ -183,40 +205,57 @@
     .rbx-logo-btn {
       display: flex;
       align-items: center;
-      gap: 8px;
-      height: 36px;
+      gap: 10px;
+      height: 38px;
       background: transparent;
       border: none;
       cursor: pointer;
       color: var(--tn-fg-bright);
-      padding: 0 4px;
-      font-size: 18px;
+      padding: 0 6px;
+      font-size: 19px;
       font-weight: 800;
-      letter-spacing: 0.3px;
+      letter-spacing: 0.4px;
+      transition: transform 0.15s ease;
     }
 
-    /* Balanced Search Bar */
+    .rbx-logo-btn:hover {
+      transform: scale(1.03);
+    }
+
+    .rbx-logo-btn svg {
+      color: #818cf8;
+      filter: drop-shadow(0 0 8px rgba(129, 140, 248, 0.65));
+    }
+
+    .rbx-logo-title {
+      background: linear-gradient(135deg, #ffffff 40%, #c7d2fe 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Balanced Modern Glass Search Bar */
     .rbx-search-container {
-      width: 200%;
-      max-width: 1037px;
-      justify-self: right;
+      width: 100%;
+      max-width: 580px;
+      margin: 0 auto;
     }
 
     .rbx-search-box {
       display: flex;
       align-items: center;
-      height: 38px;
+      height: 40px;
       background: var(--tn-input);
-      border: 1px solid var(--tn-border-hi);
-      border-radius: 8px;
+      border: 1px solid var(--tn-border);
+      border-radius: 12px;
       padding: 0 14px;
       gap: 10px;
-      transition: border-color 0.15s, background 0.15s;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
     }
 
     .rbx-search-box:focus-within {
       border-color: var(--tn-accent);
-      background: var(--tn-bg-dark);
+      background: var(--tn-surface-solid);
+      box-shadow: 0 0 0 3px var(--tn-accent-glow);
     }
 
     .rbx-search-box input {
@@ -232,6 +271,18 @@
 
     .rbx-search-box input::placeholder {
       color: var(--tn-fg-muted);
+    }
+
+    .rbx-search-hint {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--tn-fg-muted);
+      background: var(--tn-surface-hi);
+      border: 1px solid var(--tn-border);
+      padding: 2px 6px;
+      border-radius: 5px;
+      line-height: 1;
+      cursor: default;
     }
 
     .rbx-search-clear {
@@ -253,33 +304,43 @@
       display: flex;
       align-items: center;
       justify-self: end;
-      gap: 10px;
+      gap: 12px;
       position: relative;
     }
 
     .rbx-top-user {
       display: flex;
       align-items: center;
-      gap: 9px;
-      padding: 4px 6px;
-      border-radius: 8px;
+      gap: 10px;
+      padding: 4px 12px 4px 4px;
+      background: var(--tn-surface);
+      border: 1px solid var(--tn-border);
+      border-radius: 24px;
       cursor: default;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
       color: var(--tn-fg-bright);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .rbx-top-user:hover {
+      background: var(--tn-surface-hi);
+      border-color: var(--tn-border-hi);
     }
 
     .rbx-top-user img {
       width: 28px;
       height: 28px;
       border-radius: 50%;
-      background: var(--tn-surface-hi);
+      border: 2px solid var(--tn-online);
       object-fit: cover;
     }
 
     .rbx-age-tag {
-      font-size: 11px;
-      font-weight: 700;
+      font-size: 10px;
+      font-weight: 800;
       color: var(--tn-fg-sub);
       background: var(--tn-surface-hi);
       border: 1px solid var(--tn-border);
@@ -288,33 +349,37 @@
     }
 
     .rbx-icon-btn {
-      background: transparent;
-      border: none;
+      background: var(--tn-surface);
+      border: 1px solid var(--tn-border);
       color: var(--tn-fg-bright);
-      height: 36px;
-      width: 36px;
-      border-radius: 8px;
+      height: 38px;
+      width: 38px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: background 0.12s;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: all 0.15s ease;
     }
 
     .rbx-icon-btn:hover {
       background: var(--tn-surface-hi);
+      border-color: var(--tn-border-hi);
+      transform: scale(1.04);
     }
 
     /* Settings Dropdown Menu (Switch Account + Themes) */
     #rbx-settings-menu {
       position: absolute;
-      top: 46px;
+      top: 48px;
       right: 0;
-      width: 215px;
-      background: var(--tn-surface);
+      width: 220px;
+      background: var(--tn-surface-solid);
       border: 1px solid var(--tn-border-hi);
-      border-radius: 10px;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
+      border-radius: 12px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65);
       padding: 6px 0;
       display: none;
       flex-direction: column;
@@ -324,7 +389,7 @@
     .rbx-menu-label {
       padding: 6px 14px 4px;
       font-size: 11px;
-      font-weight: 700;
+      font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.6px;
       color: var(--tn-fg-muted);
@@ -336,12 +401,13 @@
       color: var(--tn-fg-bright);
       text-align: left;
       padding: 9px 14px;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      transition: background 0.12s;
     }
 
     .rbx-menu-item:hover {
@@ -354,6 +420,7 @@
       height: 7px;
       border-radius: 50%;
       background: var(--tn-accent);
+      box-shadow: 0 0 6px var(--tn-accent);
     }
 
     .rbx-menu-divider {
@@ -372,13 +439,16 @@
     }
 
     #rbx-sidebar {
-      width: 184px;
-      min-width: 184px;
-      background: var(--tn-bg-dark);
+      width: 200px;
+      min-width: 200px;
+      background: rgba(11, 12, 17, 0.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border-right: 1px solid var(--tn-border);
       display: flex;
       flex-direction: column;
-      padding: 12px 0;
+      padding: 16px 10px;
+      gap: 4px;
       overflow-y: auto;
     }
 
@@ -390,17 +460,18 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 8px 16px 14px;
+      padding: 8px 12px 14px;
       border-bottom: 1px solid var(--tn-border);
-      margin-bottom: 6px;
+      margin-bottom: 8px;
       cursor: default;
     }
 
     .rbx-side-profile img {
-      width: 30px;
-      height: 30px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
       background: var(--tn-surface-hi);
+      border: 2px solid var(--tn-online);
       object-fit: cover;
       flex-shrink: 0;
     }
@@ -418,33 +489,30 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 11px 18px;
+      padding: 10px 14px;
       background: transparent;
-      border: none;
+      border: 1px solid transparent;
+      border-radius: 10px;
       color: var(--tn-fg-sub);
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 600;
       cursor: pointer;
       text-align: left;
       position: relative;
-      transition: background 0.12s, color 0.12s;
+      transition: all 0.16s ease;
     }
 
-    .rbx-side-item:hover,
-    .rbx-side-item.active {
+    .rbx-side-item:hover {
       color: var(--tn-fg-bright);
       background: var(--tn-surface);
+      transform: translateX(2px);
     }
 
-    .rbx-side-item.active::before {
-      content: "";
-      position: absolute;
-      left: 0;
-      top: 7px;
-      bottom: 7px;
-      width: 3px;
-      background: var(--tn-accent);
-      border-radius: 0 2px 2px 0;
+    .rbx-side-item.active {
+      color: #ffffff;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.22) 0%, rgba(99, 102, 241, 0.08) 100%);
+      border-color: rgba(99, 102, 241, 0.35);
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.16);
     }
 
     .rbx-side-icon {
@@ -458,20 +526,21 @@
 
     .rbx-side-badge {
       margin-left: auto;
-      font-size: 12px;
-      font-weight: 700;
+      font-size: 11px;
+      font-weight: 800;
       background: var(--tn-surface-hi);
       color: var(--tn-fg-bright);
       padding: 2px 7px;
       border-radius: 99px;
+      border: 1px solid var(--tn-border);
     }
 
     /* Main Scrollable Content */
     #rbx-main {
       flex: 1;
       overflow-y: auto;
-      padding: 28px 36px 72px;
-      background: var(--tn-bg);
+      padding: 30px 40px 80px;
+      background: transparent;
     }
 
     #rbx-main::-webkit-scrollbar {
@@ -484,11 +553,11 @@
     }
 
     .rbx-page-title {
-      font-size: 30px;
+      font-size: 28px;
       font-weight: 800;
-      margin: 0 0 24px;
+      margin: 0 0 22px;
       color: var(--tn-fg-bright);
-      letter-spacing: -0.2px;
+      letter-spacing: -0.3px;
     }
 
     .rbx-row-section {
@@ -507,34 +576,272 @@
       font-weight: 700;
       color: var(--tn-fg-bright);
       margin: 0;
+      letter-spacing: -0.2px;
     }
 
     .rbx-see-all {
       background: transparent;
-      border: none;
+      border: 1px solid transparent;
       color: var(--tn-fg-sub);
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
       cursor: pointer;
       display: flex;
       align-items: center;
       gap: 5px;
-      padding: 4px 8px;
-      border-radius: 6px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      transition: all 0.15s ease;
     }
 
     .rbx-see-all:hover {
       color: var(--tn-fg-bright);
       background: var(--tn-surface);
+      border-color: var(--tn-border);
     }
 
     /* =======================================================================
-     HOME: FRIENDS ROW (EXACTLY 9 FRIENDS AT A TIME)
+     HERO SPOTLIGHT BANNER (THE NEXT-GEN GAMING CLIENT SPIN)
+     ======================================================================= */
+    .rbx-hero-spotlight {
+      position: relative;
+      width: 100%;
+      min-height: 290px;
+      border-radius: 18px;
+      overflow: hidden;
+      margin-bottom: 34px;
+      background: var(--tn-surface-solid);
+      border: 1px solid var(--tn-border);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: flex-end;
+      transition: border-color 0.25s, box-shadow 0.25s;
+    }
+
+    .rbx-hero-spotlight:hover {
+      border-color: var(--tn-border-glow);
+      box-shadow: 0 20px 48px rgba(0, 0, 0, 0.65), 0 0 30px var(--tn-accent-glow);
+    }
+
+    .rbx-hero-backdrop {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .rbx-hero-backdrop img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 30%;
+      filter: brightness(0.65) saturate(1.15);
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+    }
+
+    .rbx-hero-spotlight:hover .rbx-hero-backdrop img {
+      transform: scale(1.03);
+    }
+
+    .rbx-hero-gradient {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(11, 12, 17, 0.96) 0%, rgba(11, 12, 17, 0.75) 45%, rgba(11, 12, 17, 0.2) 100%),
+        linear-gradient(0deg, rgba(11, 12, 17, 0.95) 0%, transparent 50%);
+    }
+
+    .rbx-hero-content {
+      position: relative;
+      z-index: 2;
+      padding: 32px 36px;
+      max-width: 620px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .rbx-hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(99, 102, 241, 0.2);
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      color: #a5b4fc;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 99px;
+      width: fit-content;
+      backdrop-filter: blur(8px);
+    }
+
+    .rbx-hero-pulse {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #818cf8;
+      box-shadow: 0 0 8px #818cf8;
+      animation: pulse-dot 1.8s infinite;
+    }
+
+    @keyframes pulse-dot {
+      0% { transform: scale(0.9); opacity: 0.8; }
+      50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 12px #818cf8; }
+      100% { transform: scale(0.9); opacity: 0.8; }
+    }
+
+    .rbx-hero-title {
+      font-size: 32px;
+      font-weight: 800;
+      color: #ffffff;
+      margin: 0;
+      line-height: 1.15;
+      letter-spacing: -0.4px;
+      text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
+    }
+
+    .rbx-hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .rbx-hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #e2e8f0;
+      padding: 4px 10px;
+      border-radius: 8px;
+    }
+
+    .rbx-hero-pill.live {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.35);
+      color: #6ee7b7;
+    }
+
+    .rbx-hero-pill.live .pulse-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 6px #10b981;
+    }
+
+    .rbx-hero-creator {
+      color: var(--tn-fg-sub);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .rbx-hero-desc {
+      font-size: 14px;
+      color: var(--tn-fg-sub);
+      line-height: 1.5;
+      margin: 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+    }
+
+    .rbx-hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 6px;
+    }
+
+    .rbx-hero-play-btn {
+      height: 44px;
+      padding: 0 24px;
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      color: #ffffff;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
+      transition: all 0.18s ease;
+    }
+
+    .rbx-hero-play-btn:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 8px 26px rgba(99, 102, 241, 0.6);
+    }
+
+    .rbx-hero-info-btn {
+      height: 44px;
+      padding: 0 20px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(8px);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.18s ease;
+    }
+
+    .rbx-hero-info-btn:hover {
+      background: rgba(255, 255, 255, 0.16);
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .rbx-hero-nav-dots {
+      position: absolute;
+      right: 28px;
+      bottom: 24px;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .rbx-hero-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 99px;
+      background: rgba(255, 255, 255, 0.25);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+      padding: 0;
+    }
+
+    .rbx-hero-dot.active {
+      width: 24px;
+      background: #6366f1;
+      box-shadow: 0 0 10px rgba(99, 102, 241, 0.7);
+    }
+
+    /* =======================================================================
+     HOME: FRIENDS ROW (9 FRIENDS WITH STATUS RINGS)
      ======================================================================= */
     .rbx-friends-strip {
       display: grid;
       grid-template-columns: repeat(9, minmax(0, 1fr));
-      gap: 18px;
+      gap: 16px;
       padding-bottom: 4px;
     }
 
@@ -546,26 +853,28 @@
       align-items: center;
       cursor: pointer;
       text-align: center;
+      transition: transform 0.15s ease;
+    }
+
+    .rbx-friend-tile:hover {
+      transform: translateY(-3px);
     }
 
     .rbx-friend-avatar-wrap {
       position: relative;
-      width: 96px;
-      height: 96px;
+      width: 88px;
+      height: 88px;
       max-width: 100%;
       aspect-ratio: 1 / 1;
       border-radius: 50%;
-      background: var(--tn-surface);
+      background: var(--tn-surface-solid);
       margin-bottom: 8px;
-      border: 1px solid var(--tn-border);
+      border: 2px solid transparent;
+      padding: 3px;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: transform 0.14s ease;
-    }
-
-    .rbx-friend-tile:hover .rbx-friend-avatar-wrap {
-      transform: translateY(-2px);
+      transition: all 0.18s ease;
     }
 
     .rbx-friend-avatar-wrap img {
@@ -573,6 +882,16 @@
       height: 100%;
       border-radius: 50%;
       object-fit: cover;
+    }
+
+    .rbx-friend-avatar-wrap.status-online {
+      border-color: var(--tn-online);
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.35);
+    }
+
+    .rbx-friend-avatar-wrap.status-ingame {
+      border-color: var(--tn-ingame);
+      box-shadow: 0 0 14px rgba(168, 85, 247, 0.45);
     }
 
     .rbx-presence-dot {
@@ -593,7 +912,7 @@
     }
 
     .rbx-presence-ingame {
-      background: var(--tn-accent);
+      background: var(--tn-ingame);
     }
 
     .rbx-presence-offline {
@@ -623,8 +942,8 @@
 
     .rbx-friend-game {
       font-size: 11px;
-      font-weight: 600;
-      color: var(--tn-fg-bright);
+      font-weight: 700;
+      color: var(--tn-accent);
       width: 100%;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -637,11 +956,10 @@
      ======================================================================= */
     .rbx-carousel-row {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(158px, 1fr));
-      gap: 18px;
+      grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+      gap: 20px;
     }
 
-    /* Single 7-column row for Continue (no second bar) */
     #home-continue-row {
       grid-template-columns: repeat(7, minmax(0, 1fr));
     }
@@ -651,17 +969,29 @@
       flex-direction: column;
       cursor: pointer;
       position: relative;
+      transition: transform 0.22s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    .rbx-exp-tile:hover {
+      transform: translateY(-6px);
     }
 
     .rbx-exp-thumb {
       width: 100%;
       aspect-ratio: 1 / 1;
-      border-radius: 8px;
-      background: var(--tn-surface);
+      border-radius: 14px;
+      background: var(--tn-surface-solid);
       border: 1px solid var(--tn-border);
       overflow: hidden;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       position: relative;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .rbx-exp-tile:hover .rbx-exp-thumb {
+      border-color: var(--tn-border-glow);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6), 0 0 20px var(--tn-accent-glow);
     }
 
     .rbx-exp-thumb img {
@@ -669,29 +999,80 @@
       height: 100%;
       object-fit: cover;
       display: block;
-      transition: transform 0.16s ease;
+      transition: transform 0.25s ease;
     }
 
     .rbx-exp-tile:hover .rbx-exp-thumb img {
-      transform: scale(1.04);
+      transform: scale(1.05);
+    }
+
+    .rbx-exp-play-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(8, 9, 14, 0.52);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      z-index: 2;
+    }
+
+    .rbx-exp-tile:hover .rbx-exp-play-overlay,
+    .rbx-rec-card:hover .rbx-exp-play-overlay {
+      opacity: 1;
+    }
+
+    .rbx-exp-quick-play-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--tn-accent);
+      color: var(--tn-accent-fg);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px var(--tn-accent-glow);
+      transform: scale(0.85);
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.15s;
+    }
+
+    .rbx-exp-tile:hover .rbx-exp-quick-play-btn,
+    .rbx-rec-card:hover .rbx-exp-quick-play-btn {
+      transform: scale(1);
+    }
+
+    .rbx-exp-quick-play-btn:hover {
+      transform: scale(1.15) !important;
+      background: var(--tn-accent-hover);
     }
 
     .rbx-exp-title {
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 700;
       color: var(--tn-fg-bright);
-      line-height: 1.25;
-      margin-bottom: 5px;
+      line-height: 1.3;
+      margin-bottom: 6px;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
+      transition: color 0.15s;
+    }
+
+    .rbx-exp-tile:hover .rbx-exp-title,
+    .rbx-rec-card:hover .rbx-exp-title {
+      color: var(--tn-accent);
     }
 
     .rbx-exp-stats {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       font-size: 12px;
       color: var(--tn-fg-sub);
       font-weight: 600;
@@ -701,11 +1082,15 @@
       display: inline-flex;
       align-items: center;
       gap: 4px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 2px 6px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
     }
 
     .rbx-stat-item svg {
-      width: 13px;
-      height: 13px;
+      width: 12px;
+      height: 12px;
       fill: var(--tn-fg-sub);
       flex-shrink: 0;
     }
@@ -713,25 +1098,38 @@
     /* 16:9 Recommended For You Grid */
     .rbx-rec-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 22px;
     }
 
     .rbx-rec-card {
       display: flex;
       flex-direction: column;
       cursor: pointer;
+      position: relative;
+      transition: transform 0.22s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    .rbx-rec-card:hover {
+      transform: translateY(-6px);
     }
 
     .rbx-rec-banner {
       width: 100%;
       aspect-ratio: 16 / 9;
-      border-radius: 8px;
-      background: var(--tn-surface);
+      border-radius: 14px;
+      background: var(--tn-surface-solid);
       border: 1px solid var(--tn-border);
       overflow: hidden;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       position: relative;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .rbx-rec-card:hover .rbx-rec-banner {
+      border-color: var(--tn-border-glow);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6), 0 0 20px var(--tn-accent-glow);
     }
 
     .rbx-rec-banner img {
@@ -739,24 +1137,24 @@
       height: 100%;
       object-fit: cover;
       display: block;
-      transition: transform 0.16s ease;
+      transition: transform 0.25s ease;
     }
 
     .rbx-rec-card:hover .rbx-rec-banner img {
-      transform: scale(1.03);
+      transform: scale(1.04);
     }
 
     .rbx-rec-foot {
       display: flex;
-      gap: 10px;
+      gap: 12px;
       align-items: flex-start;
     }
 
     .rbx-rec-mini-icon {
-      width: 42px;
-      height: 42px;
-      border-radius: 8px;
-      background: var(--tn-surface);
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: var(--tn-surface-solid);
       border: 1px solid var(--tn-border);
       object-fit: cover;
       flex-shrink: 0;
@@ -794,6 +1192,7 @@
       padding: 12px 4px;
       cursor: pointer;
       border-bottom: 2px solid transparent;
+      transition: color 0.15s, border-color 0.15s;
     }
 
     .rbx-subtab.active {
@@ -802,16 +1201,17 @@
     }
 
     .rbx-friend-filter-input {
-      height: 36px;
+      height: 38px;
       width: 260px;
       background: var(--tn-input);
-      border: 1px solid var(--tn-border-hi);
-      border-radius: 8px;
+      border: 1px solid var(--tn-border);
+      border-radius: 10px;
       padding: 0 12px;
       color: var(--tn-fg-bright);
       font-size: 14px;
       outline: none;
       margin-bottom: 6px;
+      transition: border-color 0.15s;
     }
 
     .rbx-friend-filter-input:focus {
@@ -827,17 +1227,24 @@
     .rbx-friend-card {
       background: var(--tn-surface);
       border: 1px solid var(--tn-border);
-      border-radius: 8px;
+      border-radius: 14px;
       padding: 16px;
       display: flex;
       align-items: center;
       gap: 14px;
+      backdrop-filter: blur(8px);
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+
+    .rbx-friend-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--tn-border-hi);
     }
 
     .rbx-friend-card-avatar {
       position: relative;
-      width: 76px;
-      height: 76px;
+      width: 72px;
+      height: 72px;
       border-radius: 50%;
       background: var(--tn-bg-dark);
       flex-shrink: 0;
@@ -856,7 +1263,7 @@
     }
 
     .rbx-friend-card-title {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
       color: var(--tn-fg-bright);
       overflow: hidden;
@@ -865,7 +1272,7 @@
     }
 
     .rbx-friend-card-handle {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 500;
       color: var(--tn-fg-muted);
       margin-top: 2px;
@@ -875,7 +1282,7 @@
     }
 
     .rbx-friend-card-status {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
       margin-top: 6px;
       overflow: hidden;
@@ -887,16 +1294,19 @@
       background: var(--tn-accent);
       color: var(--tn-accent-fg);
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       padding: 8px 16px;
-      font-size: 14px;
-      font-weight: 700;
+      font-size: 13px;
+      font-weight: 800;
       cursor: pointer;
       flex-shrink: 0;
+      box-shadow: 0 4px 12px var(--tn-accent-glow);
+      transition: background 0.15s, transform 0.15s;
     }
 
     .rbx-friend-join-btn:hover {
       background: var(--tn-accent-hover);
+      transform: scale(1.04);
     }
 
     /* =======================================================================
@@ -904,16 +1314,24 @@
      ======================================================================= */
     #view-game-detail {
       display: none;
-      max-width: 980px;
+      max-width: 1040px;
       margin: 0 auto;
+    }
+
+    .rbx-detail-hero-card {
+      background: var(--tn-surface-solid);
+      border: 1px solid var(--tn-border);
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
     }
 
     .rbx-detail-hero {
       display: grid;
-      grid-template-columns: minmax(0, 640px) 316px;
-      gap: 24px;
+      grid-template-columns: minmax(0, 1fr) 330px;
+      gap: 28px;
       align-items: stretch;
-      margin-bottom: 24px;
     }
 
     @media (max-width: 960px) {
@@ -925,11 +1343,12 @@
     .rbx-detail-media {
       width: 100%;
       aspect-ratio: 16 / 9;
-      background: var(--tn-surface);
+      background: var(--tn-bg-dark);
       border: 1px solid var(--tn-border);
-      border-radius: 8px;
+      border-radius: 14px;
       overflow: hidden;
       position: relative;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
     }
 
     .rbx-detail-media img {
@@ -956,8 +1375,8 @@
     .rbx-detail-icon-sm {
       width: 64px;
       height: 64px;
-      border-radius: 10px;
-      background: var(--tn-surface);
+      border-radius: 14px;
+      background: var(--tn-surface-hi);
       border: 1px solid var(--tn-border);
       object-fit: cover;
       flex-shrink: 0;
@@ -969,10 +1388,11 @@
       color: var(--tn-fg-bright);
       margin: 0 0 6px;
       line-height: 1.18;
+      letter-spacing: -0.3px;
     }
 
     .rbx-detail-creator {
-      font-size: 14px;
+      font-size: 13px;
       color: var(--tn-fg-sub);
       font-weight: 600;
       margin-bottom: 12px;
@@ -1003,19 +1423,19 @@
       font-size: 12px;
       font-weight: 700;
       color: var(--tn-fg-sub);
-      background: var(--tn-surface);
+      background: var(--tn-surface-hi);
       border: 1px solid var(--tn-border);
       border-radius: 6px;
-      padding: 6px 10px;
+      padding: 5px 10px;
       margin-bottom: 12px;
     }
 
     .rbx-detail-quick-card {
-      background: var(--tn-surface);
+      background: var(--tn-surface-hi);
       border: 1px solid var(--tn-border);
-      border-radius: 8px;
+      border-radius: 12px;
       padding: 12px 14px;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
       display: flex;
       flex-direction: column;
       gap: 10px;
@@ -1031,7 +1451,7 @@
     .rbx-detail-quick-stat {
       background: var(--tn-bg-dark);
       border: 1px solid var(--tn-border);
-      border-radius: 6px;
+      border-radius: 8px;
       padding: 7px 6px;
     }
 
@@ -1043,10 +1463,12 @@
     }
 
     .rbx-detail-quick-lbl {
-      font-size: 11px;
-      font-weight: 600;
+      font-size: 10px;
+      font-weight: 700;
       color: var(--tn-fg-muted);
       margin-top: 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
     }
 
     .rbx-detail-quick-tags {
@@ -1061,39 +1483,41 @@
       color: var(--tn-fg-sub);
       background: var(--tn-bg-dark);
       border: 1px solid var(--tn-border);
-      border-radius: 5px;
+      border-radius: 6px;
       padding: 3px 8px;
     }
 
     .rbx-detail-play-btn {
       width: 100%;
-      height: 54px;
-      background: var(--tn-accent);
-      color: var(--tn-accent-fg);
+      height: 52px;
+      background: linear-gradient(135deg, var(--tn-accent) 0%, #4338ca 100%);
+      color: #ffffff;
       border: none;
-      border-radius: 8px;
+      border-radius: 12px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background 0.14s;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      box-shadow: 0 8px 24px var(--tn-accent-glow);
+      transition: all 0.18s ease;
     }
 
     .rbx-detail-play-btn:hover {
-      background: var(--tn-accent-hover);
-    }
-
-    .rbx-detail-play-btn svg {
-      fill: var(--tn-accent-fg);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px var(--tn-accent-glow);
     }
 
     /* Game Page Tabs */
     .rbx-game-tabs {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      background: var(--tn-surface);
-      border-bottom: 1px solid var(--tn-border);
-      border-radius: 8px 8px 0 0;
+      background: var(--tn-surface-solid);
+      border: 1px solid var(--tn-border);
+      border-radius: 12px 12px 0 0;
       margin-bottom: 20px;
     }
 
@@ -1101,12 +1525,13 @@
       background: transparent;
       border: none;
       color: var(--tn-fg-muted);
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 700;
       padding: 14px 0;
       cursor: pointer;
       border-bottom: 2px solid transparent;
       text-align: center;
+      transition: color 0.15s, border-color 0.15s;
     }
 
     .rbx-game-tab.active {
@@ -1115,22 +1540,22 @@
     }
 
     .rbx-detail-section {
-      background: var(--tn-surface);
+      background: var(--tn-surface-solid);
       border: 1px solid var(--tn-border);
-      border-radius: 8px;
-      padding: 22px 24px;
+      border-radius: 14px;
+      padding: 24px;
       margin-bottom: 28px;
     }
 
     .rbx-detail-section-title {
-      margin: 0 0 12px;
+      margin: 0 0 14px;
       font-size: 20px;
       font-weight: 700;
       color: var(--tn-fg-bright);
     }
 
     .rbx-detail-desc {
-      font-size: 15px;
+      font-size: 14px;
       color: var(--tn-fg);
       line-height: 1.6;
       white-space: pre-line;
@@ -1147,10 +1572,12 @@
     }
 
     .rbx-stat-col-label {
-      font-size: 12px;
-      font-weight: 600;
+      font-size: 11px;
+      font-weight: 700;
       color: var(--tn-fg-muted);
       margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .rbx-stat-col-val {
@@ -1163,22 +1590,35 @@
       background: var(--tn-surface-hi);
       color: var(--tn-fg-bright);
       border: 1px solid var(--tn-border-hi);
-      border-radius: 8px;
+      border-radius: 10px;
       padding: 8px 16px;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
       cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .rbx-btn-secondary:hover {
+      background: var(--tn-surface-hover);
+      transform: translateY(-1px);
     }
 
     .rbx-btn-white {
       background: var(--tn-accent);
       color: var(--tn-accent-fg);
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       padding: 8px 16px;
-      font-size: 14px;
-      font-weight: 700;
+      font-size: 13px;
+      font-weight: 800;
       cursor: pointer;
+      box-shadow: 0 4px 12px var(--tn-accent-glow);
+      transition: all 0.15s ease;
+    }
+
+    .rbx-btn-white:hover {
+      background: var(--tn-accent-hover);
+      transform: translateY(-1px);
     }
   </style>
 </head>
@@ -1194,21 +1634,22 @@
     <header id="rbx-topbar">
       <div class="rbx-top-left">
         <button class="rbx-logo-btn" id="rbx-brand-home" title="Insomniac">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
           </svg>
-          <span>Insomniac</span>
+          <span class="rbx-logo-title">Insomniac</span>
         </button>
       </div>
 
       <div class="rbx-search-container">
         <div class="rbx-search-box">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-            style="opacity:0.6">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+            style="opacity:0.6; flex-shrink:0;">
             <circle cx="11" cy="11" r="7"></circle>
             <line x1="20" y1="20" x2="16.2" y2="16.2"></line>
           </svg>
-          <input id="rbx-search-input" type="text" placeholder="Search" />
+          <input id="rbx-search-input" type="text" placeholder="Search experiences or enter Place ID..." />
+          <span class="rbx-search-hint" title="Press / to search">/</span>
           <button class="rbx-search-clear" id="rbx-search-clear" title="Clear">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
               <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -1243,8 +1684,8 @@
           <button class="rbx-menu-item" id="menu-switch-account">Switch Account</button>
           <div class="rbx-menu-divider"></div>
           <div class="rbx-menu-label">Theme</div>
+          <button class="rbx-menu-item" data-theme-pick="dark">Dark (Default)</button>
           <button class="rbx-menu-item" data-theme-pick="tokyo-night">Tokyo Night</button>
-          <button class="rbx-menu-item" data-theme-pick="dark">Dark</button>
           <button class="rbx-menu-item" data-theme-pick="light">Light</button>
         </div>
       </div>
@@ -1295,7 +1736,46 @@
       <main id="rbx-main">
         <!-- ==================== VIEW 1: HOME ==================== -->
         <div id="view-home">
-          <h1 class="rbx-page-title">Home</h1>
+          <!-- Dynamic Hero Spotlight Banner (The Next-Gen Spin) -->
+          <section class="rbx-hero-spotlight" id="home-hero-spotlight">
+            <div class="rbx-hero-backdrop">
+              <img id="hero-spotlight-bg" alt="" src="" />
+              <div class="rbx-hero-gradient"></div>
+            </div>
+            <div class="rbx-hero-content">
+              <div class="rbx-hero-badge">
+                <span class="rbx-hero-pulse"></span>
+                <span id="hero-spotlight-tag">FEATURED EXPERIENCE</span>
+              </div>
+              <h1 class="rbx-hero-title" id="hero-spotlight-title">Featured Game</h1>
+              <div class="rbx-hero-meta">
+                <span class="rbx-hero-pill live" id="hero-spotlight-playing">
+                  <span class="pulse-dot"></span> 0 Playing
+                </span>
+                <span class="rbx-hero-pill" id="hero-spotlight-rating">★ 90%</span>
+                <span class="rbx-hero-pill" id="hero-spotlight-genre">All</span>
+                <span class="rbx-hero-creator" id="hero-spotlight-creator">By Roblox</span>
+              </div>
+              <p class="rbx-hero-desc" id="hero-spotlight-desc"></p>
+              <div class="rbx-hero-actions">
+                <button class="rbx-hero-play-btn" id="hero-spotlight-play-btn">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="6,3 20,12 6,21"></polygon>
+                  </svg>
+                  <span>Play Now</span>
+                </button>
+                <button class="rbx-hero-info-btn" id="hero-spotlight-info-btn">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                  </svg>
+                  <span>Details</span>
+                </button>
+              </div>
+            </div>
+            <div class="rbx-hero-nav-dots" id="hero-spotlight-dots"></div>
+          </section>
 
           <!-- Friends Row (Shows 9 Friends) -->
           <section class="rbx-row-section">
@@ -1357,7 +1837,7 @@
               <button class="rbx-subtab" data-ffilter="online">Online</button>
               <button class="rbx-subtab" data-ffilter="ingame">In-Experience</button>
             </div>
-            <input class="rbx-friend-filter-input" id="friends-search-input" type="text" placeholder="Search" />
+            <input class="rbx-friend-filter-input" id="friends-search-input" type="text" placeholder="Search friends..." />
           </div>
           <div class="rbx-friends-grid" id="friends-full-grid"></div>
         </div>
@@ -1408,58 +1888,69 @@
 
         <!-- ==================== VIEW 4: EXPERIENCE DETAIL ==================== -->
         <div id="view-game-detail">
-          <div class="rbx-detail-hero">
-            <div class="rbx-detail-media">
-              <img id="detail-banner-img" alt="" />
-            </div>
-            <div class="rbx-detail-panel">
-              <div>
-                <div class="rbx-detail-head-group">
-                  <img class="rbx-detail-icon-sm" id="detail-icon-sm" alt="" />
-                  <div>
-                    <h1 class="rbx-detail-title" id="detail-title">Experience</h1>
-                    <div class="rbx-detail-creator">
-                      <span>By</span>
-                      <span class="creator-name" id="detail-creator">Roblox</span>
-                      <span class="rbx-verified-check" title="Verified">
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                          stroke-width="3">
-                          <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                      </span>
+          <div style="margin-bottom: 16px;">
+            <button class="rbx-btn-secondary" id="detail-back-btn" style="display:inline-flex;align-items:center;gap:6px;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
+              <span>Back</span>
+            </button>
+          </div>
+          <div class="rbx-detail-hero-card">
+            <div class="rbx-detail-hero">
+              <div class="rbx-detail-media">
+                <img id="detail-banner-img" alt="" />
+              </div>
+              <div class="rbx-detail-panel">
+                <div>
+                  <div class="rbx-detail-head-group">
+                    <img class="rbx-detail-icon-sm" id="detail-icon-sm" alt="" />
+                    <div>
+                      <h1 class="rbx-detail-title" id="detail-title">Experience</h1>
+                      <div class="rbx-detail-creator">
+                        <span>By</span>
+                        <span class="creator-name" id="detail-creator">Roblox</span>
+                        <span class="rbx-verified-check" title="Verified">
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="3">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg>
+                        </span>
+                      </div>
                     </div>
                   </div>
+                  <div class="rbx-detail-maturity">Maturity: Minimal &bull; All Ages</div>
                 </div>
-                <div class="rbx-detail-maturity">Maturity: Minimal &bull; All Ages</div>
-              </div>
 
-              <div class="rbx-detail-quick-card">
-                <div class="rbx-detail-quick-grid">
-                  <div class="rbx-detail-quick-stat">
-                    <div class="rbx-detail-quick-val" id="detail-hero-playing">0</div>
-                    <div class="rbx-detail-quick-lbl">Active</div>
+                <div class="rbx-detail-quick-card">
+                  <div class="rbx-detail-quick-grid">
+                    <div class="rbx-detail-quick-stat">
+                      <div class="rbx-detail-quick-val" id="detail-hero-playing">0</div>
+                      <div class="rbx-detail-quick-lbl">Active</div>
+                    </div>
+                    <div class="rbx-detail-quick-stat">
+                      <div class="rbx-detail-quick-val" id="detail-hero-rating">90%</div>
+                      <div class="rbx-detail-quick-lbl">Rating</div>
+                    </div>
+                    <div class="rbx-detail-quick-stat">
+                      <div class="rbx-detail-quick-val" id="detail-hero-visits">—</div>
+                      <div class="rbx-detail-quick-lbl">Visits</div>
+                    </div>
                   </div>
-                  <div class="rbx-detail-quick-stat">
-                    <div class="rbx-detail-quick-val" id="detail-hero-rating">90%</div>
-                    <div class="rbx-detail-quick-lbl">Rating</div>
-                  </div>
-                  <div class="rbx-detail-quick-stat">
-                    <div class="rbx-detail-quick-val" id="detail-hero-visits">—</div>
-                    <div class="rbx-detail-quick-lbl">Visits</div>
+                  <div class="rbx-detail-quick-tags">
+                    <span class="rbx-detail-quick-tag" id="detail-hero-genre">Genre: All</span>
+                    <span class="rbx-detail-quick-tag" id="detail-hero-server">Server: 50 Max</span>
                   </div>
                 </div>
-                <div class="rbx-detail-quick-tags">
-                  <span class="rbx-detail-quick-tag" id="detail-hero-genre">Genre: All</span>
-                  <span class="rbx-detail-quick-tag" id="detail-hero-server">Server: 50 Max</span>
-                </div>
-              </div>
 
-              <div>
-                <button class="rbx-detail-play-btn" id="detail-play-btn" title="Play">
-                  <svg width="28" height="28" viewBox="0 0 24 24">
-                    <polygon points="7,4 20,12 7,20"></polygon>
-                  </svg>
-                </button>
+                <div>
+                  <button class="rbx-detail-play-btn" id="detail-play-btn" title="Play">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                      <polygon points="7,4 20,12 7,20"></polygon>
+                    </svg>
+                    <span>Play Experience</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>

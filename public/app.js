@@ -15,12 +15,12 @@
   addEventListener("unhandledrejection", (e) => console.error("[app] rejection:", e.reason));
 
   // -------------------------------------------------------------------------
-  // 0. Apply Theme Immediately (Tokyo Night, Dark, Light)
+  // 0. Apply Theme Immediately (Automatically Default to Dark)
   // -------------------------------------------------------------------------
   const THEME_KEY = "weblox_theme";
   function applyTheme(themeName) {
-    const valid = ["tokyo-night", "dark", "light"];
-    const chosen = valid.includes(themeName) ? themeName : "tokyo-night";
+    const valid = ["dark", "tokyo-night", "light"];
+    let chosen = valid.includes(themeName) ? themeName : "dark";
     document.documentElement.setAttribute("data-theme", chosen);
     try {
       localStorage.setItem(THEME_KEY, chosen);
@@ -29,7 +29,15 @@
       btn.classList.toggle("active-theme", btn.dataset.themePick === chosen);
     });
   }
-  applyTheme((() => { try { return localStorage.getItem(THEME_KEY); } catch (e) { return "tokyo-night"; } })());
+  // Automatically start in Dark mode with zero flash of light
+  applyTheme((() => {
+    try {
+      const stored = localStorage.getItem(THEME_KEY);
+      return (stored && stored !== "light") ? stored : "dark";
+    } catch (e) {
+      return "dark";
+    }
+  })());
 
   // -------------------------------------------------------------------------
   // 1. Background Engine Pre-Compilation & Preload (Runs AFTER UI is rendered)
@@ -267,8 +275,12 @@
   let isLaunching = false;
   let activeFriendFilter = "all";
   let activeFriendQuery = "";
+  let lastActiveView = "home";
 
   function showView(name) {
+    if (name !== "detail") {
+      lastActiveView = name;
+    }
     const auth = window.auth;
     if (auth) auth.visible(false);
     bodyWrap.style.display = "flex";
@@ -327,6 +339,20 @@
     img.loading = "lazy";
     thumbWrap.appendChild(img);
 
+    // Quick-Play Overlay on Hover (Clicking launches immediately)
+    const playOverlay = document.createElement("div");
+    playOverlay.className = "rbx-exp-play-overlay";
+    const qPlayBtn = document.createElement("button");
+    qPlayBtn.className = "rbx-exp-quick-play-btn";
+    qPlayBtn.title = "Play Now";
+    qPlayBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>`;
+    qPlayBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      launchExperience(game);
+    });
+    playOverlay.appendChild(qPlayBtn);
+    thumbWrap.appendChild(playOverlay);
+
     const title = document.createElement("div");
     title.className = "rbx-exp-title";
     title.textContent = cleanName;
@@ -357,6 +383,20 @@
     bImg.alt = cleanName;
     bImg.loading = "lazy";
     banner.appendChild(bImg);
+
+    // Quick-Play Overlay on Hover
+    const playOverlay = document.createElement("div");
+    playOverlay.className = "rbx-exp-play-overlay";
+    const qPlayBtn = document.createElement("button");
+    qPlayBtn.className = "rbx-exp-quick-play-btn";
+    qPlayBtn.title = "Play Now";
+    qPlayBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>`;
+    qPlayBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      launchExperience(game);
+    });
+    playOverlay.appendChild(qPlayBtn);
+    banner.appendChild(playOverlay);
 
     const foot = document.createElement("div");
     foot.className = "rbx-rec-foot";
@@ -389,7 +429,115 @@
     return card;
   }
 
+  // -------------------------------------------------------------------------
+  // 4B. Hero Spotlight Marquee (Next-Gen Client Feature)
+  // -------------------------------------------------------------------------
+  let currentSpotlightIndex = 0;
+  let spotlightIntervalTimer = null;
+  let spotlightGames = [];
+
+  function updateSpotlightView(idx) {
+    if (!spotlightGames || !spotlightGames.length) return;
+    currentSpotlightIndex = (idx + spotlightGames.length) % spotlightGames.length;
+    const g = spotlightGames[currentSpotlightIndex];
+    if (!g) return;
+
+    const bgImg = document.getElementById("hero-spotlight-bg");
+    const titleEl = document.getElementById("hero-spotlight-title");
+    const playLiveEl = document.getElementById("hero-spotlight-playing");
+    const ratingEl = document.getElementById("hero-spotlight-rating");
+    const genreEl = document.getElementById("hero-spotlight-genre");
+    const creatorEl = document.getElementById("hero-spotlight-creator");
+    const descEl = document.getElementById("hero-spotlight-desc");
+    const dotsEl = document.getElementById("hero-spotlight-dots");
+
+    const cleanName = stripEmojis(g.name || `Place ${g.placeId}`);
+    if (bgImg) {
+      bgImg.src = g.banner || g.thumb || makeFallbackThumb(cleanName, g.placeId, true);
+    }
+    if (titleEl) titleEl.textContent = cleanName;
+    if (playLiveEl) {
+      playLiveEl.innerHTML = `<span class="pulse-dot"></span> ${formatCount(g.playing || 0)} Playing`;
+    }
+    if (ratingEl) ratingEl.textContent = `★ ${g.rating || "94%"}`;
+    if (genreEl) genreEl.textContent = g.genre || "Adventure";
+    if (creatorEl) creatorEl.textContent = `By ${stripEmojis(g.creator || "Roblox")}`;
+    if (descEl) {
+      descEl.textContent =
+        stripEmojis(g.description) ||
+        `Jump into ${cleanName}, one of the top trending multiplayer experiences right now.`;
+    }
+
+    if (dotsEl) {
+      dotsEl.querySelectorAll(".rbx-hero-dot").forEach((d, i) => {
+        d.classList.toggle("active", i === currentSpotlightIndex);
+      });
+    }
+  }
+
+  function startSpotlightTimer() {
+    if (spotlightIntervalTimer) clearInterval(spotlightIntervalTimer);
+    spotlightIntervalTimer = setInterval(() => {
+      if (viewHome && viewHome.style.display !== "none") {
+        updateSpotlightView(currentSpotlightIndex + 1);
+      }
+    }, 7500);
+  }
+
+  function initHeroSpotlight() {
+    const pool = (homeRecommendedGames.length ? homeRecommendedGames : INITIAL_GAMES).slice(0, 5);
+    spotlightGames = pool;
+
+    const dotsEl = document.getElementById("hero-spotlight-dots");
+    if (dotsEl) {
+      dotsEl.innerHTML = "";
+      spotlightGames.forEach((_, i) => {
+        const dot = document.createElement("button");
+        dot.className = "rbx-hero-dot" + (i === currentSpotlightIndex ? " active" : "");
+        dot.title = `Spotlight ${i + 1}`;
+        dot.addEventListener("click", (e) => {
+          e.stopPropagation();
+          updateSpotlightView(i);
+        });
+        dotsEl.appendChild(dot);
+      });
+    }
+
+    const playBtn = document.getElementById("hero-spotlight-play-btn");
+    if (playBtn) {
+      playBtn.onclick = (e) => {
+        e.stopPropagation();
+        const g = spotlightGames[currentSpotlightIndex];
+        if (g) launchExperience(g);
+      };
+    }
+
+    const infoBtn = document.getElementById("hero-spotlight-info-btn");
+    if (infoBtn) {
+      infoBtn.onclick = (e) => {
+        e.stopPropagation();
+        const g = spotlightGames[currentSpotlightIndex];
+        if (g) openExperienceDetail(g);
+      };
+    }
+
+    const heroWrap = document.getElementById("home-hero-spotlight");
+    if (heroWrap) {
+      heroWrap.onmouseenter = () => {
+        if (spotlightIntervalTimer) clearInterval(spotlightIntervalTimer);
+      };
+      heroWrap.onmouseleave = () => {
+        startSpotlightTimer();
+      };
+    }
+
+    updateSpotlightView(currentSpotlightIndex);
+    startSpotlightTimer();
+  }
+
   function renderHomeAndCharts() {
+    initHeroSpotlight();
+
     const contRow = document.getElementById("home-continue-row");
     contRow.innerHTML = "";
     for (const g of homeContinueGames.slice(0, 7)) {
@@ -454,6 +602,11 @@
       tile.className = "rbx-friend-tile";
       const avWrap = document.createElement("div");
       avWrap.className = "rbx-friend-avatar-wrap";
+      if (f.presenceType === 2) {
+        avWrap.classList.add("status-ingame");
+      } else if (f.presenceType === 1) {
+        avWrap.classList.add("status-online");
+      }
       const img = document.createElement("img");
       img.src = f.avatar || makeAvatarPlaceholder(displayName);
       img.alt = displayName;
@@ -1301,6 +1454,22 @@
       searchClear.style.display = "none";
       if (viewSearch && viewSearch.style.display !== "none") {
         showView("home");
+      }
+    });
+
+    // Detail Page Back Button
+    const detailBackBtn = document.getElementById("detail-back-btn");
+    if (detailBackBtn) {
+      detailBackBtn.addEventListener("click", () => {
+        showView(lastActiveView || "home");
+      });
+    }
+
+    // Keyboard shortcut '/' to search
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "/" && document.activeElement !== searchInput && !e.target.matches("input, textarea")) {
+        e.preventDefault();
+        searchInput.focus();
       }
     });
 
