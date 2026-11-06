@@ -8,7 +8,7 @@
   <link rel="icon" type="image/png" sizes="16x16" href="/roblox-icon-16.png">
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="apple-touch-icon" href="/roblox-icon.png">
-  <title>Roblox</title>
+  <title>■</title>
   <style>
     @font-face {
       font-family: "Builder Sans";
@@ -191,61 +191,44 @@
     .rbx-logo-btn {
       display: flex;
       align-items: center;
-      gap: 9px;
+      justify-content: center;
+      width: 38px;
       height: 38px;
       background: transparent;
       border: none;
       cursor: pointer;
       color: var(--tn-fg-bright);
-      padding: 0 4px;
+      padding: 0;
+      border-radius: 8px;
       text-decoration: none;
-      transition: opacity 0.15s ease;
+      transition: background 0.15s ease, opacity 0.15s ease;
       flex-shrink: 0;
     }
 
     .rbx-logo-btn:hover {
-      opacity: 0.85;
+      background: var(--tn-surface-hi);
+      opacity: 0.9;
     }
 
-    .rbx-logo-text {
-      font-family: "Builder Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      font-size: 21px;
-      font-weight: 800;
-      letter-spacing: -0.2px;
-      color: var(--tn-fg-bright);
-      user-select: none;
-      line-height: 1;
-      white-space: nowrap;
-    }
-
-    @media (max-width: 600px) {
-      .rbx-logo-text {
-        display: none;
-      }
-      .rbx-search-container {
-        flex: 1 1 auto;
-        max-width: 220px;
-        min-width: 100px;
-      }
-    }
-
-    /* Balanced Search Bar */
+    /* Long Search Bar stretching all the way to settings */
     .rbx-search-container {
-      flex: 0 1 360px;
-      max-width: 360px;
-      min-width: 140px;
+      flex: 1 1 auto;
+      width: 100%;
+      min-width: 100px;
       margin: 0;
     }
 
     .rbx-search-box {
+      width: 100%;
+      box-sizing: border-box;
       display: flex;
       align-items: center;
-      height: 36px;
+      height: 38px;
       background: var(--tn-input);
       border: 1px solid var(--tn-border-hi);
       border-radius: 8px;
-      padding: 0 12px;
-      gap: 8px;
+      padding: 0 14px;
+      gap: 10px;
       transition: border-color 0.15s, background 0.15s;
     }
 
@@ -1252,11 +1235,10 @@
     <!-- Top Header -->
     <header id="rbx-topbar">
       <div class="rbx-top-left">
-        <button class="rbx-logo-btn" id="rbx-brand-home" title="Roblox" aria-label="Roblox">
+        <button class="rbx-logo-btn" id="rbx-brand-home" title="Home" aria-label="Home">
           <svg width="28" height="28" viewBox="0 0 56 56" fill="currentColor">
             <path fill-rule="evenodd" d="M11.676 0 0 44.166 43.577 56l11.676-44.166zm20.409 35.827-12.177-3.308 3.264-12.342 12.182 3.308z"/>
           </svg>
-          <span class="rbx-logo-text">ROBLOX</span>
         </button>
       </div>
 

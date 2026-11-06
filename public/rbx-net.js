@@ -237,14 +237,6 @@
       app.FFlagUseRbxTransportServer = "False";
       app.DFFlagEnableReactiveGameJoin3 = "False";
       app.DFFlagEnableReactiveGameJoin4 = "False";
-      app.DFIntRbxStorageInitHundredthsPercent = "0";
-      app.DFIntRbxStorageErrorLogHundredthsPercent = "0";
-      app.FLogLocalStorage = "0";
-      app.FFlagForceEnableSquad = "False";
-      app.FFlagIsSquadLobbySessionEnabled = "False";
-      app.FLogGameJoinUtil = "7";
-      app.FLogGameJoinV2 = "7";
-      app.FLogUgcExperienceController = "7";
     }
     console.log("[rbxnet] Network mode: RakNet UDP over WS-UDP active (status " + r.status + ")");
     return new Response(JSON.stringify(doc), {
