@@ -113,6 +113,44 @@ def read_cached(file: Path, cacheable: bool) -> bytes:
     return data
 
 # ---------------------------------------------------------------------------
+# Pre-packaged Core UI Bundle for instant VFS registration
+# ---------------------------------------------------------------------------
+_UI_BUNDLE_GZ: bytes | None = None
+_UI_BUNDLE_LOCK = threading.Lock()
+
+def get_ui_bundle_gz() -> bytes:
+    global _UI_BUNDLE_GZ
+    with _UI_BUNDLE_LOCK:
+        if _UI_BUNDLE_GZ is not None:
+            return _UI_BUNDLE_GZ
+        engine_root = ROOT / "engine"
+        meta_file = engine_root / "WebClient.metadata.json"
+        bundle = {}
+        if meta_file.is_file():
+            try:
+                import gzip
+                patterns = (
+                    "/Settings/", "/VR/", "/Menu/", "rectBackgroundWhite",
+                    "/DropDown/", "/Slider/", "chatBubble", "dialog_", "scroll",
+                    "mouseLock", "/common/", "/Help/"
+                )
+                meta = json.loads(meta_file.read_text(encoding="utf-8"))
+                for x in meta:
+                    p = x.get("path", "")
+                    if any(k in p for k in patterns):
+                        disk_path = engine_root / p.lstrip("/").replace("/", os.sep)
+                        if disk_path.is_file():
+                            bundle[p] = base64.b64encode(disk_path.read_bytes()).decode("ascii")
+                raw = json.dumps(bundle).encode("utf-8")
+                _UI_BUNDLE_GZ = gzip.compress(raw)
+            except Exception as e:
+                sys.stderr.write(f"[ui-bundle] build failed: {e}\n")
+                _UI_BUNDLE_GZ = b"{}"
+        else:
+            _UI_BUNDLE_GZ = b"{}"
+        return _UI_BUNDLE_GZ
+
+# ---------------------------------------------------------------------------
 # Multi-client session manager
 # ---------------------------------------------------------------------------
 class ClientSession:
@@ -593,6 +631,23 @@ class InsomniacHandler(BaseHTTPRequestHandler):
 
         if parsed.path in ("/config.json", "/config"):
             self._respond_json(200, {"ok": True, "hasDefaultCookie": bool(DEFAULT_COOKIE)}, is_new_sid=is_new, sid=sess.sid)
+            return
+
+        if parsed.path == "/api/engine/ui-bundle":
+            gz_data = get_ui_bundle_gz()
+            self.send_response(200)
+            self.send_header("content-type", "application/json; charset=utf-8")
+            self.send_header("content-encoding", "gzip")
+            self.send_header("content-length", str(len(gz_data)))
+            for name, value in SECURITY_HEADERS:
+                self.send_header(name, value)
+            self.send_header("access-control-allow-origin", "*")
+            self.send_header("cache-control", "public, max-age=86400")
+            self.end_headers()
+            try:
+                self.wfile.write(gz_data)
+            except (ConnectionAbortedError, BrokenPipeError):
+                pass
             return
 
         # Serve static file from ROOT

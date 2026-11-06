@@ -31,12 +31,21 @@
     "ephemeralcounters.api.roblox.com",
     "lms.roblox.com",
     "tracers.roblox.com",
+    "sentry-relay.rbxinfra.com",
+    "sentry.io",
   ]);
 
   const isTelemetry = (url) => {
+    if (!url) return false;
     const host = hostOf(url);
-    if (TELEMETRY.has(host)) return true;
-    if (typeof url === "string" && (url.includes("/experience-signals-ingest/") || url.includes("/telemetry/"))) return true;
+    if (TELEMETRY.has(host) || host.endsWith(".rbxinfra.com")) return true;
+    if (typeof url === "string" && (
+      url.includes("/experience-signals-ingest/") ||
+      url.includes("/telemetry/") ||
+      url.includes("/envelope/") ||
+      url.includes("/api/29/store/") ||
+      url.includes("/api/26/store/")
+    )) return true;
     return false;
   };
 
@@ -207,11 +216,7 @@
       app.FLogGameJoinV2 = "7";
       app.FLogUgcExperienceController = "7";
     }
-    console.log("[rbxnet] settings override -> " + JSON.stringify({
-      raknet: app && app.FFlagUseRbxTransportClient3,
-      reactiveJoin: app && app.DFFlagEnableReactiveGameJoin3,
-      status: r.status,
-    }));
+    console.log("[rbxnet] Network mode: RakNet UDP over WS-UDP active (status " + r.status + ")");
     return new Response(JSON.stringify(doc), {
       status: r.status,
       headers: { "content-type": "application/json" },
@@ -243,6 +248,12 @@
   const origFetch = self.fetch;
   self.fetch = function (input, init) {
     const url = typeof input === "string" ? input : input && input.url;
+    if (url && isTelemetry(url)) {
+      return Promise.resolve(new Response("{}", {
+        status: 200,
+        headers: { "content-type": "application/json" }
+      }));
+    }
     if (url && SETTINGS_RE.test(new URL(url, base).href)) return settingsOverride(new URL(url, base).href, init);
     if (!url || !isRoblox(url)) {
       const pass = init || undefined;
@@ -288,7 +299,8 @@
       open(method, url) {
         this._method = method;
         this._url = new URL(url, base).href;
-        this._robox = isRoblox(this._url);
+        this._telemetry = isTelemetry(this._url);
+        this._robox = this._telemetry || isRoblox(this._url);
         if (!this._robox) {
           this._real = new OrigXHR();
           const real = this._real;
