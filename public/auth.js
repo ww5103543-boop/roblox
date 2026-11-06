@@ -117,17 +117,12 @@
         "z-index:200",
       ].join(";");
 
-      const GUEST_COOKIE =
-        "_" +
-        "|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_" +
-        "CAEQAhoGCAIQBBgBIhsKBGR1aWQSEzMxNjYzMDQ5OTA2NDcyOTQ3MzIiEgoFdW5hbWUSCXI2c2RpZmluZCISCgN1aWQSCzExOTM4OTM1MjA0KAM.7iMIuejHTvsI7333kDAn1o09ZGT2-p5RoOMcpu56MX71ndqJ72YH-BLgnoOAe_u7TPcw6NQQ7eNNUo0JuxvAr7X8hvFlD5z-3ghiYnIho65RGqnB10GNRrGOO_Msl2QcdnFMZjBCXJETCNbP8u6rxKr0jD_MaogUaiHfCs1KhQS-CdvgU_sejiFJsGAg8rcUvMGayGB3yJK6p-jYVCmRWKM6FxLv54l_udJLzVU4TU0VBVUwZjhQiQlCThj4xQ3ioip0XknQ1qLOIUBT9tkircUZlWPSGNcc87B5Ul3qhgjUQ6Q1UHSQ4c_xup8m2HQmqA3cKoLhyB0D_nLqLNvy7UIyxn4WtZ35DHYqvs3cSDMeMq8wFXiWb0jfECUXmyS-BoGYmG8lVuKD7irFDGZh6S1vnYLOYK3facNjUiJG9VmPKqpMMuDjeEvLMBIUJhvDF1KscImgWAvMR_WGJGqJ-QWabLjqknQfXXY7oGs_zJEk-OKMHnFjR9zwjC0jnPBclVstGn5lCI65zUcc-8JmIg2vdeRoE4vXuUnhMUKWXeYgxOQ2_arfFqqPrV8kdTmn3RFNOf1Tbm6cpZnk52knUw46XLTkNUEPOxnx01OKdzv4NFuOCUmDmzQ2sODWjLsRkCiP1x49Qe1ykDfWeEIs1dG0iscBqRXk9FbIAqte1PABkSJ-BKezRYzvreippEStrIlAZPnQKqBuaxv67hTf7HVmrsFEGp0f7ioTl7VIuQP9tHMY73j5n6W1pWbDcAqwP2kSvSblw9pBKI6_UVCAq_f1PALg2VoUTP4fm5WVkHXao0rz-pBIbvvibE0Npl9ivkrSMoPDF6vN56lT1J9pUAETcn2R-2p3LVf4HD7WYjOh3WVWxZV4aVgfctfF9IoG.5cjc1mkhyiV3Pz4qtzY2tLIugzU";
-
       wrap.innerHTML = `
         <div style="width:100%;max-width:390px;margin:auto;box-sizing:border-box;background:rgba(24,26,36,0.95);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.14);border-radius:16px;padding:32px 28px;box-shadow:0 24px 64px rgba(0,0,0,0.85);color:#ffffff;display:flex;flex-direction:column;align-items:center;text-align:center;">
           <!-- Branding -->
           <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:22px;color:#ffffff;">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M18.92 2.01L5.08 6.84 2.01 20.69 15.85 15.86 18.92 2.01zM13.44 13.44l-4.14 1.45-1.45-4.14 4.14-1.45 1.45 4.14z"/>
+              <path fill-rule="evenodd" d="M18.92 2.01L5.08 6.84 2.01 20.69 15.85 15.86 18.92 2.01zM13.44 13.44l-4.14 1.45-1.45-4.14 4.14-1.45 1.45 4.14z"/>
             </svg>
             <span style="font-size:24px;font-weight:800;letter-spacing:0.3px;">Roblox</span>
           </div>
@@ -151,20 +146,6 @@
 
             <!-- Status Message -->
             <div id="web-login-status" style="display:none;width:100%;margin-top:12px;font-size:12px;font-weight:600;color:#f7768e;line-height:1.4;"></div>
-
-            <!-- Faint Unhide Guest Link -->
-            <div style="margin-top:20px;display:flex;flex-direction:column;align-items:center;width:100%;">
-              <button id="web-login-unhide-guest-btn" style="background:transparent;border:none;color:rgba(255,255,255,0.22);font-size:11px;font-weight:500;cursor:pointer;padding:4px 8px;text-decoration:none;transition:color 0.2s;">
-                (unhide guest)
-              </button>
-
-              <!-- Guest Section (Hidden by default) -->
-              <div id="web-login-guest-section" style="display:none;width:100%;margin-top:12px;border-top:1px solid rgba(255,255,255,0.08);padding-top:14px;">
-                <button id="web-login-guest-btn" style="width:100%;height:40px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.85);font-size:13px;font-weight:700;cursor:pointer;transition:all 0.15s ease;">
-                  Play as Guest
-                </button>
-              </div>
-            </div>
           </div>
         </div>
       `;
@@ -174,44 +155,6 @@
       const cookieInput = wrap.querySelector("#web-login-cookie-input");
       const cookieBtn = wrap.querySelector("#web-login-cookie-btn");
       const statusEl = wrap.querySelector("#web-login-status");
-      const unhideGuestBtn = wrap.querySelector("#web-login-unhide-guest-btn");
-      const guestSection = wrap.querySelector("#web-login-guest-section");
-      const guestBtn = wrap.querySelector("#web-login-guest-btn");
-
-      if (unhideGuestBtn && guestSection) {
-        unhideGuestBtn.addEventListener("click", () => {
-          const isHidden = guestSection.style.display === "none";
-          guestSection.style.display = isHidden ? "block" : "none";
-          unhideGuestBtn.textContent = isHidden ? "(hide guest)" : "(unhide guest)";
-          unhideGuestBtn.style.color = isHidden ? "rgba(255,255,255,0.45)" : "rgba(255,255,255,0.22)";
-        });
-      }
-
-      if (guestBtn) {
-        guestBtn.addEventListener("click", async () => {
-          if (statusEl) {
-            statusEl.style.display = "block";
-            statusEl.style.color = "#a9b1d6";
-            statusEl.textContent = "Logging in as Guest...";
-          }
-          try {
-            const user = await this.injectCookie(GUEST_COOKIE);
-            localStorage.setItem("weblox_rbx_cookie", GUEST_COOKIE);
-            if (statusEl) {
-              statusEl.style.display = "none";
-              statusEl.textContent = "";
-            }
-            this.visible(false);
-            return user;
-          } catch (e) {
-            if (statusEl) {
-              statusEl.style.display = "block";
-              statusEl.style.color = "#f7768e";
-              statusEl.textContent = "Guest login failed: " + (e && e.message ? e.message : "cookie rejected");
-            }
-          }
-        });
-      }
 
       const submitCookie = async () => {
         const val = (cookieInput && cookieInput.value ? cookieInput.value : "").trim();
