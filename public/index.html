@@ -1247,7 +1247,96 @@
       cursor: pointer;
     }
 
-        /* Settings Modal Dialog */
+        /* Join Game Loading Modal Dialog */
+    .rbx-join-dialog {
+      background: var(--tn-surface);
+      border: 1px solid var(--tn-border-hi);
+      border-radius: 14px;
+      padding: 34px 38px;
+      width: 360px;
+      max-width: 90vw;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.75);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      animation: rbxPop 0.18s ease-out;
+    }
+
+    .rbx-spinner-wrap {
+      position: relative;
+      width: 72px;
+      height: 72px;
+      margin-bottom: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .rbx-spinner-ring {
+      position: absolute;
+      inset: 0;
+      border: 3.5px solid rgba(255, 255, 255, 0.12);
+      border-top-color: var(--tn-online, #7aa2f7);
+      border-radius: 50%;
+      animation: rbxSpin 0.9s cubic-bezier(0.5, 0.1, 0.4, 0.9) infinite;
+    }
+
+    .rbx-spinner-logo {
+      color: var(--tn-fg-bright, #ffffff);
+      opacity: 0.95;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: rbxPulse 1.8s ease-in-out infinite;
+    }
+
+    @keyframes rbxSpin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes rbxPulse {
+      0%, 100% { transform: scale(1); opacity: 0.95; }
+      50% { transform: scale(0.92); opacity: 0.75; }
+    }
+
+    .rbx-join-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--tn-fg-bright);
+      margin-bottom: 6px;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .rbx-join-subtitle {
+      font-size: 13px;
+      color: var(--tn-fg-muted);
+      margin-bottom: 22px;
+      min-height: 18px;
+    }
+
+    .rbx-join-cancel-btn {
+      background: var(--tn-surface-hi);
+      color: var(--tn-fg-bright);
+      border: 1px solid var(--tn-border);
+      padding: 8px 24px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .rbx-join-cancel-btn:hover {
+      background: var(--tn-border-hi);
+      border-color: var(--tn-border-hi);
+    }
+
+    /* Settings Modal Dialog */
     .rbx-modal-overlay {
       position: fixed;
       inset: 0;
@@ -1767,6 +1856,23 @@
   <script src="/ring.js?v=20261105v1"></script>
   <script src="/auth.js?v=20261105v1"></script>
   <script src="/app.js?v=20261105v1"></script>
+  <!-- Join Game Loading Overlay -->
+  <div id="rbx-join-overlay" class="rbx-modal-overlay">
+    <div class="rbx-join-dialog">
+      <div class="rbx-spinner-wrap">
+        <div class="rbx-spinner-ring"></div>
+        <div class="rbx-spinner-logo">
+          <svg width="34" height="34" viewBox="0 0 56 56" fill="currentColor">
+            <path fill-rule="evenodd" d="M11.676 0 0 44.166 43.577 56l11.676-44.166zm20.409 35.827-12.177-3.308 3.264-12.342 12.182 3.308z"/>
+          </svg>
+        </div>
+      </div>
+      <div class="rbx-join-title" id="rbx-join-title">Joining Experience</div>
+      <div class="rbx-join-subtitle" id="rbx-join-subtitle">Connecting to Roblox server...</div>
+      <button class="rbx-join-cancel-btn" id="rbx-join-cancel" type="button">Cancel</button>
+    </div>
+  </div>
+
   <!-- Settings Modal Dialog -->
   <div id="rbx-settings-overlay" class="rbx-modal-overlay">
     <div class="rbx-settings-dialog">

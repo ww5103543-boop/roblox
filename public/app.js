@@ -1207,13 +1207,49 @@
       saveSessionCache();
     }
 
-    // 1. Show the Roblox canvas immediately at 0ms
+    // 1. Show Join Loading Modal Dialog with spinning Roblox icon
     if (auth) auth.visible(false);
-    shell.style.display = "none";
 
-    const canvas = document.getElementById("canvas");
-    if (canvas) {
-      try { canvas.focus(); } catch (e) {}
+    const joinOverlay = document.getElementById("rbx-join-overlay");
+    const joinTitle = document.getElementById("rbx-join-title");
+    const joinSubtitle = document.getElementById("rbx-join-subtitle");
+    const joinCancel = document.getElementById("rbx-join-cancel");
+
+    const gameName = (typeof gameInput === "object" && gameInput.name) ? gameInput.name : "";
+    if (joinTitle) joinTitle.textContent = gameName ? `Joining ${gameName}` : "Joining Experience";
+    if (joinSubtitle) joinSubtitle.textContent = "Connecting to Roblox server...";
+    if (joinOverlay) {
+      joinOverlay.style.opacity = "1";
+      joinOverlay.style.display = "flex";
+    }
+
+    let hasStartedGame = false;
+    function finishAndHideOverlay() {
+      if (hasStartedGame) return;
+      hasStartedGame = true;
+      if (joinOverlay) {
+        joinOverlay.style.opacity = "0";
+        joinOverlay.style.transition = "opacity 0.25s ease-out";
+        setTimeout(() => {
+          joinOverlay.style.display = "none";
+          joinOverlay.style.opacity = "1";
+        }, 250);
+      }
+      shell.style.display = "none";
+      const canvas = document.getElementById("canvas");
+      if (canvas) {
+        try { canvas.focus(); } catch (e) {}
+      }
+    }
+
+    window.addEventListener("rbx:game-started", finishAndHideOverlay, { once: true });
+
+    if (joinCancel) {
+      joinCancel.onclick = () => {
+        isLaunching = false;
+        if (joinOverlay) joinOverlay.style.display = "none";
+        shell.style.display = "flex";
+      };
     }
 
     window.__placeId = placeId;
@@ -1221,11 +1257,14 @@
       history.replaceState(null, "", "?placeId=" + placeId);
     } catch (e) {}
 
-    // 2. Start auth.join + UDP socket in parallel so WasmPlayer.js does NOT wait for it
+    // 2. Start auth.join + UDP socket in parallel
     startEnginePreload();
     auth.pendingJoinPromise = (async () => {
       const join = await auth.join(placeId);
       window.__join = join;
+      if (joinSubtitle && !hasStartedGame) {
+        joinSubtitle.textContent = "Server ready! Loading Roblox engine...";
+      }
       let peer = join.udmux;
       if (!peer && join.connections && join.connections.length) {
         // Avoid internal RFC1918 datacenter IPs if a public address is available
@@ -1233,22 +1272,30 @@
       }
       if (!peer || !peer.Address) throw new Error("join script has no reachable endpoint");
       await __rkRing.start({ host: peer.Address, port: peer.Port, script: join.script });
+
+      // Fallback timer: ensure overlay dismisses once ring connection is fully operational
+      setTimeout(() => {
+        finishAndHideOverlay();
+      }, 1600);
+
       return join;
     })();
 
     auth.pendingJoinPromise.catch((e) => {
       console.error("[app] launch failed:", e);
       isLaunching = false;
+      if (joinOverlay) joinOverlay.style.display = "none";
       shell.style.display = "flex";
       alert("Unable to join experience: " + (e && e.message ? e.message : e));
     });
 
-    // 3. Boot WasmPlayer.js immediately at 0ms
+    // 3. Boot WasmPlayer.js
     window._wasmLoaded = true;
     const s = document.createElement("script");
     s.src = "/engine/WasmPlayer.js";
     s.onerror = () => {
       isLaunching = false;
+      if (joinOverlay) joinOverlay.style.display = "none";
       shell.style.display = "flex";
     };
     document.body.appendChild(s);
