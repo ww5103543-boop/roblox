@@ -220,37 +220,6 @@
       app.FLogGameJoinUtil = "7";
       app.FLogGameJoinV2 = "7";
       app.FLogUgcExperienceController = "7";
-      // Lag fix, Gray Sky, FPS boost & graphics optimization flags
-      app.FFlagDebugSkyGray = "True";
-      app.DFFlagDebugSkyGray = "True";
-      app.DFIntTaskSchedulerTargetFps = "240";
-      app.FIntTaskSchedulerTargetFps = "240";
-      app.FFlagTaskSchedulerLimitTargetFpsTo2402 = "True";
-      app.DFIntGraphicsOptimizationMode = "1";
-      app.DFIntGraphicsOptimizationModePerformanceBiasPercent = "100";
-      app.DFIntGraphicsOptimizationModePerformanceScalePercent = "100";
-      app.DFIntGraphicsOptimizationModeFRMFrameRateTarget = "240";
-      app.DFIntGraphicsOptimizationModeMinFrameTimeTargetMs = "4";
-      app.FFlagEnableReducedLatency = "True";
-      app.DFIntTargetTimeDelayFacctorTenths = "0";
-      app.FFlagFRMUseStaticTargetModes = "True";
-      app.FFlagDisablePostFx = "True";
-      app.FFlagDisableShadows = "True";
-      app.FFlagDisableGlobalShadows = "True";
-      app.FIntRenderShadowIntensity = "0";
-      app.FFlagDisableBloom = "True";
-      app.FFlagDisableDepthOfField = "True";
-      app.FFlagFixBlackSky2 = "True";
-      app.FFlagDebugForceFutureIsBrightPhase3 = "False";
-      // Lowest textures & lowest graphics quality
-      app.FIntDebugTextureManagerSkipMips = "3";
-      app.DFIntDebugTextureManagerSkipMips = "3";
-      app.FIntDebugAdditionalNumberOfMipsToSkipForNonAlbedoTextures = "3";
-      app.DFIntDebugAdditionalNumberOfMipsToSkipForNonAlbedoTextures = "3";
-      app.FIntRenderTextureMipBias = "2000";
-      app.DFIntRenderTextureMipBias = "2000";
-      app.FIntDebugFRMQualityLevelOverride = "1";
-      app.DFIntDebugFRMQualityLevelOverride = "1";
     }
     console.log("[rbxnet] Network mode: RakNet UDP over WS-UDP active (status " + r.status + ")");
     return new Response(JSON.stringify(doc), {

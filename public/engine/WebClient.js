@@ -13,6 +13,54 @@
 (function () {
   try {
     const _pats = [
+      "[DIRECT KEY]",
+      "[Direct Mouse",
+      "DIRECT KEY",
+      "Direct Mouse",
+      "Tick ",
+      "(input drops total:",
+      " created",
+      "[channel]",
+      "[wasm-cors]",
+      "Wrap-deformer",
+      "Hidden Surface Removal",
+      "texParameter",
+      "INVALID_OPERATION",
+      "Gamepad API",
+      "isTouchDevice",
+      "isTouchScreenDevice",
+      "isKeyboardDevice",
+      "isMouseDevice",
+      "initialize returned",
+      "launchUGCGame",
+      "[FMOD]",
+      "touchOnly",
+      "Canvas:",
+      "main loop",
+      "[LIFECYCLE]",
+      "serving cached join-game response",
+      "Replicator created",
+      "Time taken to initialize schema",
+      "Assigned peer id",
+      "[onServiceProvider]",
+      "Join snapshot timer",
+      "OTAPollingEnabled",
+      "ClientWeatherBootstrapper",
+      "Server RobloxGitHash",
+      "Server Prefix",
+      "[_UniversalAppPatch]",
+      "[_InExperiencePatch]",
+      "STARTING EMOTE",
+      "com_outfits_exp_grp",
+      "Notifications when exceeding max accessories",
+      "asset_button_options_layout",
+      "Successfully Loaded Catalog",
+      "Welcome to Catalog Avatar Creator",
+      "Recommended Community Outfits",
+      "GetBatchItemDetails",
+      "429 Too Many Requests",
+      "Too Many Requests",
+      "MeshContentProvider",
       "[WASM-TIMING]",
       "[WASM-JSPI]",
       "[WASM-RNA]",
@@ -54,7 +102,6 @@
       "LocalStorageHandler",
       "LocalStorageManager",
       "Asset is not approved",
-      "MeshContentProvider failed",
       "Synchronous JavaScript allocator",
       "rectBackgroundWhite",
       "Slider/Left",
@@ -73,12 +120,21 @@
         const a = args[i];
         if (typeof a === "string") {
           const s = a.trim();
+          if (!s) return true;
+          if (s === "created" || s.endsWith("created")) return true;
+          if (s.startsWith("[DIRECT KEY]") || s.includes("[DIRECT KEY]") || s.includes("DIRECT KEY")) return true;
+          if (s.startsWith("[Direct Mouse") || s.includes("Direct Mouse")) return true;
+          if (s.startsWith("Tick ") && s.includes("took")) return true;
           if (s.length <= 2 && /^[wasdWASD0-9\-_]+$/.test(s)) return true;
           if (/^(starting|started)\b/i.test(s) && !s.includes("[auth]") && !s.includes("[rkring]")) return true;
           if (s.includes("w (error)") || s.includes("w(error)")) return true;
           for (let j = 0; j < _pats.length; j++) if (s.includes(_pats[j])) return true;
         } else if (a && typeof a === "object") {
           const m = ((a.message || a.error || a.reason || "") + "").trim();
+          if (!m) continue;
+          if (m.startsWith("[DIRECT KEY]") || m.includes("DIRECT KEY")) return true;
+          if (m.startsWith("[Direct Mouse") || m.includes("Direct Mouse")) return true;
+          if (m.startsWith("Tick ") && m.includes("took")) return true;
           if (m.length <= 2 && /^[wasdWASD0-9\-_]+$/.test(m)) return true;
           if (m.includes("w (error)") || m.includes("w(error)")) return true;
           for (let j = 0; j < _pats.length; j++) if (m.includes(_pats[j])) return true;
@@ -86,11 +142,12 @@
       }
       return false;
     };
-    const _ol = console.log, _ow = console.warn, _oe = console.error, _oi = console.info;
+    const _ol = console.log, _ow = console.warn, _oe = console.error, _oi = console.info, _od = console.debug;
     console.log = function (...a) { if (_check(a)) return; return _ol.apply(console, a); };
     console.warn = function (...a) { if (_check(a)) return; return _ow.apply(console, a); };
     console.error = function (...a) { if (_check(a)) return; return _oe.apply(console, a); };
     console.info = function (...a) { if (_check(a)) return; return _oi.apply(console, a); };
+    console.debug = function (...a) { if (_check(a)) return; return _od.apply(console, a); };
   } catch (e) {}
   if (typeof importScripts !== "function") return;
   if (typeof trustedTypes !== "undefined") {
