@@ -536,9 +536,13 @@ class InsomniacHandler(BaseHTTPRequestHandler):
     server_version = "Insomniac/1.0"
 
     def log_message(self, fmt, *args):
-        # Silence routine static asset logs in production
-        if len(args) >= 2 and str(args[1]) in ("200", "304") and not str(args[0]).startswith("POST"):
-            return
+        # Silence routine successful requests, static assets, and proxy traffic
+        if len(args) >= 2:
+            req_str = str(args[0])
+            status_str = str(args[1])
+            if status_str in ("200", "304"):
+                if any(x in req_str for x in ("/api/rbx/request", "/config", "/api/session", "/api/rbx/whoami", "GET ")):
+                    return
         sys.stderr.write(f"[{time.strftime('%H:%M:%S')}] {fmt % args}\n")
 
     def _get_session(self) -> tuple[ClientSession, bool]:
