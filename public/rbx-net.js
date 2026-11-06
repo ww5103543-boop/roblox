@@ -241,6 +241,16 @@
       app.FFlagDisableBloom = "True";
       app.FFlagDisableDepthOfField = "True";
       app.FFlagFixBlackSky2 = "True";
+      app.FFlagDebugForceFutureIsBrightPhase3 = "False";
+      // Lowest textures & lowest graphics quality
+      app.FIntDebugTextureManagerSkipMips = "3";
+      app.DFIntDebugTextureManagerSkipMips = "3";
+      app.FIntDebugAdditionalNumberOfMipsToSkipForNonAlbedoTextures = "3";
+      app.DFIntDebugAdditionalNumberOfMipsToSkipForNonAlbedoTextures = "3";
+      app.FIntRenderTextureMipBias = "2000";
+      app.DFIntRenderTextureMipBias = "2000";
+      app.FIntDebugFRMQualityLevelOverride = "1";
+      app.DFIntDebugFRMQualityLevelOverride = "1";
     }
     console.log("[rbxnet] Network mode: RakNet UDP over WS-UDP active (status " + r.status + ")");
     return new Response(JSON.stringify(doc), {

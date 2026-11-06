@@ -5,24 +5,41 @@
 (function () {
   try {
     const _pats = [
-      "Hello world",
-      "Hello again",
-      "RbxStorage",
-      "UserGameSettings",
-      "[FLog::Graphics]",
+      "[WASM-TIMING]",
+      "[WASM-JSPI]",
+      "[WASM-RNA]",
+      "[FLog::",
+      "[DFLog::",
+      "[pthread]",
+      "Available WebGL Extensions:",
+      "- EXT_",
+      "- OES_",
+      "- WEBGL_",
+      "- KHR_",
+      "- NV_",
       "GL Vendor",
       "GLSL version",
       "Ext: ",
       "handleConnectErrorFromJs",
-      "[WASM-RNA]",
       "WebTransport",
       "WasmMultiplexedConnection",
-      "[DFLog::HttpTraceError]",
-      "[DFLog::RbxTransportDummyClient]",
       "All use of Roblox services must comply",
       "RobloxGitHash:",
       "The base url is",
       "The channel is",
+      "Base URL:",
+      "Base Host:",
+      "Wasm Memory Bytes =",
+      "Registered ",
+      "No prefetch:",
+      "heartbeat #",
+      "Redirecting WebWorker",
+      "audio-processor-fast.js",
+      "WebClient.js",
+      "Hello world",
+      "Hello again",
+      "RbxStorage",
+      "UserGameSettings",
       "Squad.NetworkStatus",
       "useSquadState",
       "SettingsHub",
@@ -31,29 +48,41 @@
       "Asset is not approved",
       "MeshContentProvider failed",
       "Synchronous JavaScript allocator",
-      "rectBackgroundWhite.png",
-      "Slider/Left.png",
-      "Slider/Less.png",
-      "DropDown/DropDown.png"
+      "rectBackgroundWhite",
+      "Slider/Left",
+      "Slider/Less",
+      "DropDown/DropDown",
+      "stream == nullptr",
+      "Invalid image or texture",
+      "[CookiePool]",
+      "[IXP]",
+      "[Flags]",
+      "pixel ratio change observed"
     ];
     const _shouldSuppress = (args) => {
+      if (!args || args.length === 0) return true;
       for (let i = 0; i < args.length; i++) {
         const a = args[i];
         if (typeof a === "string") {
+          const s = a.trim();
+          if (s.length <= 2 && /^[wasdWASD0-9\-_]+$/.test(s)) return true;
+          if (/^(starting|started)\b/i.test(s) && !s.includes("[auth]") && !s.includes("[rkring]")) return true;
+          if (s.includes("w (error)") || s.includes("w(error)")) return true;
           for (let j = 0; j < _pats.length; j++) {
-            if (a.includes(_pats[j])) return true;
+            if (s.includes(_pats[j])) return true;
           }
         } else if (a && typeof a === "object") {
-          const m = a.message || a.error || "";
-          if (typeof m === "string") {
-            for (let j = 0; j < _pats.length; j++) {
-              if (m.includes(_pats[j])) return true;
-            }
+          const m = ((a.message || a.error || a.reason || "") + "").trim();
+          if (m.length <= 2 && /^[wasdWASD0-9\-_]+$/.test(m)) return true;
+          if (m.includes("w (error)") || m.includes("w(error)")) return true;
+          for (let j = 0; j < _pats.length; j++) {
+            if (m.includes(_pats[j])) return true;
           }
         }
       }
       return false;
     };
+    window.__shouldSuppressLog = _shouldSuppress;
     const _ol = console.log, _ow = console.warn, _oe = console.error, _oi = console.info;
     console.log = function (...args) {
       if (_shouldSuppress(args)) return;
