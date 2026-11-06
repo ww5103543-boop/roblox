@@ -733,6 +733,44 @@
   // -------------------------------------------------------------------------
   // 6. Progressive Account Loader (Home Updates First, Charts Second)
   // -------------------------------------------------------------------------
+  async function resolveUserAgeBracket(auth) {
+    try {
+      const ageRes = await auth.fetchJson("https://users.roblox.com/v1/users/authenticated/age-bracket");
+      if (ageRes && ageRes.ageBracket !== undefined) {
+        const ab = ageRes.ageBracket;
+        if (ab === 0 || ab === "0" || ab === "Under13" || ab === "<13") return "<13";
+        if (ab === 1 || ab === "1" || ab === "Over13" || ab === "13+") return "13+";
+        if (ab === 2 || ab === "2" || ab === "Over17" || ab === "17+") return "17+";
+        if (typeof ab === "number" && ab >= 13) return `${ab}+`;
+        if (typeof ab === "string" && ab) return ab;
+      }
+    } catch (e) {}
+
+    try {
+      const bRes = await auth.fetchJson("https://accountinformation.roblox.com/v1/birthdate");
+      if (bRes && bRes.birthYear) {
+        const now = new Date();
+        const bDate = new Date(bRes.birthYear, (bRes.birthMonth || 1) - 1, bRes.birthDay || 1);
+        let age = now.getFullYear() - bDate.getFullYear();
+        const m = now.getMonth() - bDate.getMonth();
+        if (m < 0 || (m === 0 && now.getDate() < bDate.getDate())) age--;
+        if (age >= 17) return "17+";
+        if (age >= 13) return "13+";
+        return "<13";
+      }
+    } catch (e) {}
+
+    try {
+      const gRes = await auth.fetchJson("https://apis.roblox.com/experience-guidelines-service/v1/user-age-recommendation");
+      if (gRes && gRes.ageRecommendationDetails && gRes.ageRecommendationDetails.summary) {
+        const s = gRes.ageRecommendationDetails.summary.ageRecommendation;
+        if (s && s.displayName) return s.displayName;
+      }
+    } catch (e) {}
+
+    return "13+";
+  }
+
   async function loadUserAndFriendsData(auth, who) {
     if (!who) return;
     const myDisplay = who.displayName || who.name || "Player";
@@ -746,6 +784,11 @@
     topUser.style.display = "flex";
     loginSwitchBtn.style.display = "none";
     signupSwitchBtn.style.display = "none";
+
+    resolveUserAgeBracket(auth).then((tag) => {
+      const topAgeTag = document.getElementById("rbx-top-age-tag");
+      if (topAgeTag) topAgeTag.textContent = tag;
+    }).catch(() => {});
 
     try {
       const myId = Number(who.id);

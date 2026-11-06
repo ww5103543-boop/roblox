@@ -186,6 +186,7 @@
     .rbx-top-left {
       display: flex;
       align-items: center;
+      gap: 12px;
       flex-shrink: 0;
     }
 
@@ -1409,6 +1410,12 @@
             <path fill-rule="evenodd" d="M11.676 0 0 44.166 43.577 56l11.676-44.166zm20.409 35.827-12.177-3.308 3.264-12.342 12.182 3.308z"/>
           </svg>
         </button>
+
+        <div class="rbx-top-user" id="rbx-top-user" style="display:none">
+          <img id="rbx-top-avatar" alt="" />
+          <span id="rbx-top-username">Player</span>
+          <span class="rbx-age-tag" id="rbx-top-age-tag">13+</span>
+        </div>
       </div>
 
       <div class="rbx-search-container">
@@ -1429,12 +1436,6 @@
       </div>
 
       <div class="rbx-top-right">
-        <div class="rbx-top-user" id="rbx-top-user" style="display:none">
-          <img id="rbx-top-avatar" alt="" />
-          <span id="rbx-top-username">Player</span>
-          <span class="rbx-age-tag">13+</span>
-        </div>
-
         <button class="rbx-btn-white" id="rbx-login-switch-btn" style="display:none">Log In</button>
         <button class="rbx-btn-secondary" id="rbx-signup-switch-btn" style="display:none">Sign Up</button>
 
@@ -1448,18 +1449,18 @@
           </svg>
         </button>
 
-                <div id="rbx-settings-menu">
+        <div id="rbx-settings-menu">
           <div class="rbx-menu-label">Settings</div>
           <button class="rbx-menu-item" id="menu-open-settings" type="button">
-            <span>⚙️ Settings</span>
+            <span>Settings</span>
           </button>
           <div class="rbx-menu-divider"></div>
           <div class="rbx-menu-label">Account</div>
           <button class="rbx-menu-item" id="menu-switch-account" type="button">
-            <span>🔄 Switch Account</span>
+            <span>Switch Account</span>
           </button>
           <button class="rbx-menu-item" id="menu-logout-btn" type="button">
-            <span>🚪 Log Out</span>
+            <span>Log Out</span>
           </button>
           <div class="rbx-menu-divider"></div>
           <div class="rbx-menu-label">Theme</div>
