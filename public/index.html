@@ -1,8 +1,16 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="tokyo-night">
 
 <head>
   <meta charset="utf-8">
+  <script>
+    try {
+      var t = localStorage.getItem("weblox_theme") || "tokyo-night";
+      document.documentElement.setAttribute("data-theme", t);
+    } catch (e) {}
+  </script>
+  <link rel="preconnect" href="https://thumbnails.roblox.com">
+  <link rel="preconnect" href="https://apis.roblox.com">
   <link rel="icon" type="image/svg+xml" href="/roblox-icon.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="/roblox-icon-32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/roblox-icon-16.png">
@@ -50,24 +58,6 @@
      THEME PALETTES: DARK (AUTOMATIC DEFAULT), TOKYO NIGHT, LIGHT
      ======================================================================= */
     :root,
-    html[data-theme="dark"] {
-      --tn-bg: #191b1d;
-      --tn-bg-dark: #232527;
-      --tn-surface: #232527;
-      --tn-surface-hi: #2b2d2f;
-      --tn-input: #111214;
-      --tn-border: #393b3d;
-      --tn-border-hi: #494d50;
-      --tn-fg: #d0d2d4;
-      --tn-fg-bright: #ffffff;
-      --tn-fg-muted: #8c8f93;
-      --tn-fg-sub: #b8babc;
-      --tn-accent: #ffffff;
-      --tn-accent-hover: #e2e4e6;
-      --tn-accent-fg: #191b1d;
-      --tn-online: #00a2ff;
-    }
-
     html[data-theme="tokyo-night"] {
       --tn-bg: #1a1b26;
       --tn-bg-dark: #16161e;
@@ -84,6 +74,24 @@
       --tn-accent-hover: #e5e9f5;
       --tn-accent-fg: #16161e;
       --tn-online: #7aa2f7;
+    }
+
+    html[data-theme="dark"] {
+      --tn-bg: #191b1d;
+      --tn-bg-dark: #232527;
+      --tn-surface: #232527;
+      --tn-surface-hi: #2b2d2f;
+      --tn-input: #111214;
+      --tn-border: #393b3d;
+      --tn-border-hi: #494d50;
+      --tn-fg: #d0d2d4;
+      --tn-fg-bright: #ffffff;
+      --tn-fg-muted: #8c8f93;
+      --tn-fg-sub: #b8babc;
+      --tn-accent: #ffffff;
+      --tn-accent-hover: #e2e4e6;
+      --tn-accent-fg: #191b1d;
+      --tn-online: #00a2ff;
     }
 
     html[data-theme="light"] {
@@ -384,9 +392,7 @@
     }
 
     .rbx-menu-divider {
-      height: 1px;
-      background: var(--tn-border);
-      margin: 5px 0;
+      display: none;
     }
 
     /* =======================================================================
@@ -664,6 +670,14 @@
       text-overflow: ellipsis;
       white-space: nowrap;
       margin-top: 2px;
+    }
+
+    .rbx-exp-tile,
+    .rbx-rec-card,
+    .rbx-friend-card,
+    .rbx-friend-tile {
+      content-visibility: auto;
+      contain-intrinsic-size: 0 160px;
     }
 
     /* =======================================================================
@@ -1273,7 +1287,7 @@
       align-items: center;
       justify-content: space-between;
       padding: 16px 20px;
-      border-bottom: 1px solid var(--tn-border);
+      border-bottom: none;
     }
 
     .rbx-settings-title {
@@ -1314,7 +1328,7 @@
       align-items: center;
       justify-content: space-between;
       padding: 10px 0;
-      border-bottom: 1px solid var(--tn-border);
+      border-bottom: none;
     }
 
     .rbx-settings-row-info {
@@ -1454,7 +1468,6 @@
           <button class="rbx-menu-item" id="menu-open-settings" type="button">
             <span>Settings</span>
           </button>
-          <div class="rbx-menu-divider"></div>
           <div class="rbx-menu-label">Account</div>
           <button class="rbx-menu-item" id="menu-switch-account" type="button">
             <span>Switch Account</span>
@@ -1462,7 +1475,6 @@
           <button class="rbx-menu-item" id="menu-logout-btn" type="button">
             <span>Log Out</span>
           </button>
-          <div class="rbx-menu-divider"></div>
           <div class="rbx-menu-label">Theme</div>
           <button class="rbx-menu-item" data-theme-pick="dark" type="button">Dark</button>
           <button class="rbx-menu-item" data-theme-pick="tokyo-night" type="button">Tokyo Night</button>

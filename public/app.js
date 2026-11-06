@@ -20,7 +20,7 @@
   const THEME_KEY = "weblox_theme";
   function applyTheme(themeName) {
     const valid = ["dark", "tokyo-night", "light"];
-    let chosen = valid.includes(themeName) ? themeName : "dark";
+    let chosen = valid.includes(themeName) ? themeName : "tokyo-night";
     document.documentElement.setAttribute("data-theme", chosen);
     try {
       localStorage.setItem(THEME_KEY, chosen);
@@ -32,9 +32,9 @@
   applyTheme((() => {
     try {
       const stored = localStorage.getItem(THEME_KEY);
-      return (stored && stored !== "light") ? stored : "dark";
+      return (stored && ["dark", "tokyo-night", "light"].includes(stored)) ? stored : "tokyo-night";
     } catch (e) {
-      return "dark";
+      return "tokyo-night";
     }
   })());
 
@@ -1479,11 +1479,15 @@
         renderFriendsPageGrid();
       });
     });
+    let _friendSearchTimer = null;
     const friendSearchInput = document.getElementById("friends-search-input");
     if (friendSearchInput) {
       friendSearchInput.addEventListener("input", () => {
-        activeFriendQuery = friendSearchInput.value || "";
-        renderFriendsPageGrid();
+        clearTimeout(_friendSearchTimer);
+        _friendSearchTimer = setTimeout(() => {
+          activeFriendQuery = friendSearchInput.value || "";
+          renderFriendsPageGrid();
+        }, 120);
       });
     }
 
