@@ -8,6 +8,25 @@ window.__wasmLoaderContext = {
   workerStubUrl: location.origin + "/stub.js",
 };
 
+// Filter misleading Roblox internal engine logs that use "Critical" channel levels for routine startup logs
+const _origWarn = console.warn;
+console.warn = function (...args) {
+  const msg = typeof args[0] === "string" ? args[0] : "";
+  if (msg.includes("[DFLog::RbxStorage] RbxStorage::init")) {
+    return console.debug(...args);
+  }
+  return _origWarn.apply(console, args);
+};
+
+const _origError = console.error;
+console.error = function (...args) {
+  const msg = typeof args[0] === "string" ? args[0] : "";
+  if (msg.includes("[DFLog::RbxStorage] RbxStorage::init")) {
+    return console.debug(...args);
+  }
+  return _origError.apply(console, args);
+};
+
 // require-trusted-types-for 'script' rejects a plain string on script.src,
 // new Worker(...) and importScripts(). A policy named "default" is applied to
 // every sink automatically, so no call site — ours or the engine's — has to

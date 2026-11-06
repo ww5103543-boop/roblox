@@ -1165,6 +1165,19 @@
     if (auth) auth.visible(false);
     shell.style.display = "none";
 
+    const exitPill = document.getElementById("rbx-game-exit-pill");
+    if (exitPill) {
+      exitPill.style.display = "inline-flex";
+      exitPill.onclick = () => {
+        window.location.href = "/";
+      };
+    }
+
+    const canvas = document.getElementById("canvas");
+    if (canvas) {
+      try { canvas.focus(); } catch (e) {}
+    }
+
     window.__placeId = placeId;
     try {
       history.replaceState(null, "", "?placeId=" + placeId);
@@ -1188,6 +1201,7 @@
     auth.pendingJoinPromise.catch((e) => {
       console.error("[app] launch failed:", e);
       isLaunching = false;
+      if (exitPill) exitPill.style.display = "none";
       shell.style.display = "flex";
       alert("Unable to join experience: " + (e && e.message ? e.message : e));
     });
