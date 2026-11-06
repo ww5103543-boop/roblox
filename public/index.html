@@ -280,12 +280,18 @@
       display: flex;
       align-items: center;
       gap: 9px;
-      padding: 4px 6px;
+      padding: 4px 8px;
       border-radius: 8px;
-      cursor: default;
+      cursor: pointer;
       font-size: 14px;
       font-weight: 700;
       color: var(--tn-fg-bright);
+      transition: background 0.15s ease;
+      user-select: none;
+    }
+
+    .rbx-top-user:hover {
+      background: var(--tn-surface-hi);
     }
 
     .rbx-top-user img {
@@ -412,7 +418,14 @@
       padding: 8px 16px 14px;
       border-bottom: 1px solid var(--tn-border);
       margin-bottom: 6px;
-      cursor: default;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background 0.15s ease, opacity 0.15s ease;
+      user-select: none;
+    }
+
+    .rbx-side-profile:hover {
+      background: var(--tn-surface-hi);
     }
 
     .rbx-side-profile img {
@@ -1222,6 +1235,623 @@
       font-weight: 700;
       cursor: pointer;
     }
+
+    /* =======================================================================
+     PROFILE VIEW (Official Roblox Layout & Aesthetics)
+     ======================================================================= */
+    #view-profile {
+      display: none;
+      max-width: 980px;
+      margin: 0 auto;
+      padding-bottom: 40px;
+    }
+
+    .rbx-profile-header-card {
+      background: var(--tn-surface);
+      border: 1px solid var(--tn-border);
+      border-radius: 12px;
+      padding: 24px 28px;
+      margin-bottom: 24px;
+    }
+
+    .rbx-profile-header-top {
+      display: flex;
+      gap: 28px;
+      align-items: flex-start;
+    }
+
+    @media (max-width: 680px) {
+      .rbx-profile-header-top {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+    }
+
+    .rbx-profile-avatar-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .rbx-profile-avatar-frame {
+      position: relative;
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--tn-surface-hi) 0%, var(--tn-bg) 100%);
+      border: 3px solid var(--tn-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+      transition: width 0.25s ease, height 0.25s ease, border-radius 0.25s ease;
+    }
+
+    .rbx-profile-avatar-frame.mode-full {
+      width: 150px;
+      height: 190px;
+      border-radius: 12px;
+    }
+
+    .rbx-profile-avatar-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.2s ease;
+    }
+
+    .rbx-profile-avatar-frame.mode-full .rbx-profile-avatar-img {
+      object-fit: contain;
+    }
+
+    .rbx-profile-avatar-frame:hover .rbx-profile-avatar-img {
+      transform: scale(1.04);
+    }
+
+    .rbx-profile-presence-dot {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 3px solid var(--tn-surface);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+      z-index: 2;
+    }
+
+    .rbx-profile-view-toggle-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--tn-surface-hi);
+      border: 1px solid var(--tn-border);
+      border-radius: 20px;
+      padding: 4px 12px;
+      color: var(--tn-fg);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .rbx-profile-view-toggle-btn:hover {
+      background: var(--tn-border);
+      color: var(--tn-fg-bright);
+      border-color: var(--tn-border-hi);
+    }
+
+    .rbx-profile-details {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .rbx-profile-names-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 680px) {
+      .rbx-profile-names-row {
+        justify-content: center;
+      }
+    }
+
+    .rbx-profile-display-name {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--tn-fg-bright);
+      margin: 0;
+      line-height: 1.15;
+      letter-spacing: -0.3px;
+    }
+
+    .rbx-profile-verified-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .rbx-profile-username-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+      font-size: 14px;
+      color: var(--tn-fg-muted);
+      font-weight: 500;
+    }
+
+    @media (max-width: 680px) {
+      .rbx-profile-username-row {
+        justify-content: center;
+      }
+    }
+
+    .rbx-profile-username {
+      color: var(--tn-fg-muted);
+    }
+
+    .rbx-profile-dot-sep {
+      opacity: 0.5;
+    }
+
+    .rbx-profile-join-date {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .rbx-profile-presence-status {
+      margin-top: 10px;
+      display: inline-block;
+    }
+
+    .rbx-presence-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .rbx-presence-pill.online {
+      background: rgba(0, 176, 111, 0.15);
+      color: #00b06f;
+      border: 1px solid rgba(0, 176, 111, 0.3);
+    }
+
+    .rbx-presence-pill.ingame {
+      background: rgba(0, 162, 255, 0.15);
+      color: #00a2ff;
+      border: 1px solid rgba(0, 162, 255, 0.3);
+    }
+
+    .rbx-presence-pill.offline {
+      background: rgba(140, 143, 147, 0.15);
+      color: var(--tn-fg-muted);
+      border: 1px solid var(--tn-border);
+    }
+
+    .rbx-profile-stats-row {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      margin: 18px 0;
+      padding: 12px 0;
+      border-top: 1px solid var(--tn-border);
+      border-bottom: 1px solid var(--tn-border);
+    }
+
+    @media (max-width: 680px) {
+      .rbx-profile-stats-row {
+        justify-content: center;
+      }
+    }
+
+    .rbx-profile-stat {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+      cursor: default;
+    }
+
+    .rbx-profile-stat.clickable {
+      cursor: pointer;
+      border-radius: 6px;
+      padding: 2px 6px;
+      margin: -2px -6px;
+      transition: background 0.15s ease;
+    }
+
+    .rbx-profile-stat.clickable:hover {
+      background: var(--tn-surface-hi);
+    }
+
+    .rbx-profile-stat-val {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--tn-fg-bright);
+    }
+
+    .rbx-profile-stat-lbl {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--tn-fg-muted);
+      text-transform: capitalize;
+    }
+
+    .rbx-profile-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 680px) {
+      .rbx-profile-actions {
+        justify-content: center;
+      }
+    }
+
+    .rbx-btn-primary {
+      background: var(--tn-accent);
+      color: var(--tn-accent-fg);
+      border: none;
+      border-radius: 8px;
+      padding: 10px 22px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s ease, transform 0.1s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .rbx-btn-primary:hover {
+      background: var(--tn-accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .rbx-btn-secondary {
+      background: var(--tn-surface-hi);
+      color: var(--tn-fg-bright);
+      border: 1px solid var(--tn-border);
+      border-radius: 8px;
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .rbx-btn-secondary:hover {
+      background: var(--tn-border);
+      border-color: var(--tn-border-hi);
+      transform: translateY(-1px);
+    }
+
+    /* Tabs Bar */
+    .rbx-profile-nav-tabs {
+      display: flex;
+      gap: 28px;
+      border-bottom: 2px solid var(--tn-border);
+      margin-bottom: 24px;
+    }
+
+    .rbx-profile-tab {
+      background: none;
+      border: none;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--tn-fg-muted);
+      padding: 10px 4px 14px;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      transition: color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .rbx-profile-tab:hover {
+      color: var(--tn-fg-bright);
+    }
+
+    .rbx-profile-tab.active {
+      color: var(--tn-fg-bright);
+      border-bottom-color: var(--tn-fg-bright);
+    }
+
+    /* Content Cards */
+    .rbx-profile-card {
+      background: var(--tn-surface);
+      border: 1px solid var(--tn-border);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 20px;
+    }
+
+    .rbx-card-header-flex {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .rbx-card-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--tn-fg-bright);
+      margin: 0 0 12px;
+    }
+
+    .rbx-card-header-flex .rbx-card-title {
+      margin: 0;
+    }
+
+    .rbx-card-subtitle {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--tn-fg-muted);
+    }
+
+    .rbx-link-btn {
+      background: none;
+      border: none;
+      color: #00a2ff;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 0;
+      transition: opacity 0.15s ease;
+    }
+
+    .rbx-link-btn:hover {
+      opacity: 0.8;
+      text-decoration: underline;
+    }
+
+    .rbx-profile-about-bio {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--tn-fg);
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin: 0;
+    }
+
+    /* Currently Wearing Grid */
+    .rbx-profile-wearing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 14px;
+    }
+
+    .rbx-wearing-item-card {
+      background: var(--tn-input);
+      border: 1px solid var(--tn-border);
+      border-radius: 8px;
+      padding: 10px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 6px;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+      position: relative;
+    }
+
+    .rbx-wearing-item-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--tn-border-hi);
+    }
+
+    .rbx-wearing-item-thumb {
+      width: 78px;
+      height: 78px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .rbx-wearing-item-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--tn-fg-bright);
+      line-height: 1.25;
+      width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .rbx-wearing-item-type {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--tn-fg-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    /* Badges Grid */
+    .rbx-profile-badges-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 16px;
+    }
+
+    .rbx-badge-card {
+      background: var(--tn-input);
+      border: 1px solid var(--tn-border);
+      border-radius: 8px;
+      padding: 12px 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 8px;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+
+    .rbx-badge-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--tn-border-hi);
+    }
+
+    .rbx-badge-card img {
+      width: 64px;
+      height: 64px;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+    }
+
+    .rbx-badge-card-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--tn-fg-bright);
+      line-height: 1.25;
+      width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Friends Preview Grid */
+    .rbx-profile-friends-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+      gap: 14px;
+    }
+
+    .rbx-profile-friend-mini {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 8px;
+      transition: background 0.15s ease, transform 0.15s ease;
+    }
+
+    .rbx-profile-friend-mini:hover {
+      background: var(--tn-surface-hi);
+      transform: translateY(-2px);
+    }
+
+    .rbx-profile-friend-mini-avatar {
+      position: relative;
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      overflow: hidden;
+      background: var(--tn-surface-hi);
+      border: 2px solid var(--tn-border);
+    }
+
+    .rbx-profile-friend-mini-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .rbx-profile-friend-mini-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--tn-fg-bright);
+      text-align: center;
+      width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Creations Grid */
+    .rbx-profile-creations-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 18px;
+    }
+
+    .rbx-creation-card {
+      background: var(--tn-input);
+      border: 1px solid var(--tn-border);
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+    }
+
+    .rbx-creation-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--tn-border-hi);
+    }
+
+    .rbx-creation-thumb {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: var(--tn-surface);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .rbx-creation-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .rbx-creation-body {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .rbx-creation-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--tn-fg-bright);
+      line-height: 1.25;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .rbx-creation-play-btn {
+      margin-top: auto;
+      background: #00b06f;
+      color: #ffffff;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background 0.15s ease;
+    }
+
+    .rbx-creation-play-btn:hover {
+      background: #00965e;
+    }
   </style>
 </head>
 
@@ -1294,7 +1924,7 @@
     <!-- Body: Sidebar + Main -->
     <div id="rbx-body">
       <aside id="rbx-sidebar">
-        <div class="rbx-side-profile" id="rbx-side-profile">
+        <div class="rbx-side-profile" id="rbx-side-profile" title="View Profile" role="button" tabindex="0">
           <img id="rbx-side-avatar" alt="" />
           <span id="rbx-side-username">Player</span>
         </div>
@@ -1306,6 +1936,16 @@
             </svg>
           </span>
           <span>Home</span>
+        </button>
+
+        <button class="rbx-side-item" data-side="profile">
+          <span class="rbx-side-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          </span>
+          <span>Profile</span>
         </button>
 
         <button class="rbx-side-item" data-side="friends">
@@ -1553,6 +2193,148 @@
             </div>
             <div class="rbx-carousel-row" id="detail-recommended-row"></div>
           </section>
+        </div>
+
+        <!-- ==================== VIEW: PROFILE (Roblox Official Layout) ==================== -->
+        <div id="view-profile" style="display:none">
+          <!-- Profile Header Card -->
+          <div class="rbx-profile-header-card">
+            <div class="rbx-profile-header-top">
+              <!-- Avatar Section with 2D/3D render switch and presence dot -->
+              <div class="rbx-profile-avatar-box">
+                <div class="rbx-profile-avatar-frame mode-full" id="profile-avatar-frame">
+                  <img id="profile-avatar-img" class="rbx-profile-avatar-img" src="" alt="Avatar" />
+                  <div id="profile-presence-indicator" class="rbx-profile-presence-dot rbx-presence-offline"></div>
+                </div>
+                <!-- Toggle button between Full Body 3D and Headshot -->
+                <button id="profile-avatar-view-toggle" class="rbx-profile-view-toggle-btn" title="Toggle 2D Headshot / 3D Full Body">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                    <line x1="12" y1="22.08" x2="12" y2="12" />
+                  </svg>
+                  <span id="profile-avatar-toggle-label">Headshot</span>
+                </button>
+              </div>
+
+              <!-- User Info & Meta -->
+              <div class="rbx-profile-details">
+                <div class="rbx-profile-names-row">
+                  <h1 id="profile-display-name" class="rbx-profile-display-name">Player</h1>
+                  <span id="profile-verified-badge" class="rbx-profile-verified-badge" style="display:none" title="Verified Badge">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="#00a2ff">
+                      <path d="m8.6 22.5-1.9-3.2-3.6-.8.4-3.7-2.5-2.8 2.5-2.8-.4-3.7 3.6-.8 1.9-3.2 3.4 1.5 3.4-1.5 1.9 3.2 3.6.8-.4 3.7 2.5 2.8-2.5 2.8.4 3.7-3.6.8-1.9 3.2-3.4-1.5zm1.9-7.2 6.5-6.5-1.4-1.4-5.1 5.1-2.3-2.3-1.4 1.4z"/>
+                    </svg>
+                  </span>
+                </div>
+
+                <div class="rbx-profile-username-row">
+                  <span id="profile-username" class="rbx-profile-username">@Player</span>
+                  <span class="rbx-profile-dot-sep">•</span>
+                  <span id="profile-join-date" class="rbx-profile-join-date">Joined Nov 2026</span>
+                </div>
+
+                <div id="profile-presence-text" class="rbx-profile-presence-status">
+                  <span class="rbx-presence-pill online">● Online</span>
+                </div>
+
+                <!-- Stats row (Friends, Followers, Following) -->
+                <div class="rbx-profile-stats-row">
+                  <div class="rbx-profile-stat clickable" id="profile-stat-friends-btn" title="View Friends">
+                    <span class="rbx-profile-stat-val" id="profile-stat-friends">0</span>
+                    <span class="rbx-profile-stat-lbl">Friends</span>
+                  </div>
+                  <div class="rbx-profile-stat">
+                    <span class="rbx-profile-stat-val" id="profile-stat-followers">0</span>
+                    <span class="rbx-profile-stat-lbl">Followers</span>
+                  </div>
+                  <div class="rbx-profile-stat">
+                    <span class="rbx-profile-stat-val" id="profile-stat-following">0</span>
+                    <span class="rbx-profile-stat-lbl">Following</span>
+                  </div>
+                </div>
+
+                <!-- Action buttons row -->
+                <div class="rbx-profile-actions">
+                  <button id="profile-action-primary" class="rbx-btn-primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                      <path d="M12 20h9"/>
+                      <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                    </svg>
+                    <span>Customize Avatar</span>
+                  </button>
+                  <button id="profile-action-share" class="rbx-btn-secondary" title="Share Profile">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                      <circle cx="18" cy="5" r="3" />
+                      <circle cx="6" cy="12" r="3" />
+                      <circle cx="18" cy="19" r="3" />
+                      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                    </svg>
+                    <span>Share</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Profile Tabs Bar (About / Creations) -->
+          <div class="rbx-profile-nav-tabs">
+            <button class="rbx-profile-tab active" data-ptab="about" id="profile-tab-btn-about">About</button>
+            <button class="rbx-profile-tab" data-ptab="creations" id="profile-tab-btn-creations">Creations</button>
+          </div>
+
+          <!-- Tab 1: About Content -->
+          <div id="profile-tab-about" class="rbx-profile-tab-content">
+            <!-- Card: About / Bio -->
+            <div class="rbx-card rbx-profile-card">
+              <h3 class="rbx-card-title">About</h3>
+              <p id="profile-about-text" class="rbx-profile-about-bio">No bio available.</p>
+            </div>
+
+            <!-- Card: Currently Wearing -->
+            <div class="rbx-card rbx-profile-card">
+              <div class="rbx-card-header-flex">
+                <h3 class="rbx-card-title">Currently Wearing</h3>
+                <span id="profile-wearing-count" class="rbx-card-subtitle">0 items</span>
+              </div>
+              <div id="profile-wearing-grid" class="rbx-profile-wearing-grid">
+                <div class="rbx-wearing-empty" style="color:var(--tn-fg-muted);font-size:13px;padding:8px 0">Loading avatar items...</div>
+              </div>
+            </div>
+
+            <!-- Card: Friends Preview -->
+            <div class="rbx-card rbx-profile-card">
+              <div class="rbx-card-header-flex">
+                <h3 class="rbx-card-title" id="profile-friends-preview-title">Friends (0)</h3>
+                <button id="profile-see-all-friends" class="rbx-link-btn">See All &gt;</button>
+              </div>
+              <div id="profile-friends-preview-grid" class="rbx-profile-friends-preview-grid">
+                <div style="color:var(--tn-fg-muted);font-size:13px;padding:8px 0">No friends to show.</div>
+              </div>
+            </div>
+
+            <!-- Card: Roblox Badges -->
+            <div class="rbx-card rbx-profile-card">
+              <div class="rbx-card-header-flex">
+                <h3 class="rbx-card-title">Roblox Badges</h3>
+                <span id="profile-badges-count" class="rbx-card-subtitle">0 badges</span>
+              </div>
+              <div id="profile-badges-grid" class="rbx-profile-badges-grid">
+                <div style="color:var(--tn-fg-muted);font-size:13px;padding:8px 0">No badges earned yet.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab 2: Creations Content -->
+          <div id="profile-tab-creations" class="rbx-profile-tab-content" style="display:none">
+            <div class="rbx-card rbx-profile-card">
+              <h3 class="rbx-card-title">Experiences</h3>
+              <div id="profile-creations-grid" class="rbx-profile-creations-grid">
+                <div style="color:var(--tn-fg-muted);font-size:13px;padding:8px 0">No public experiences.</div>
+              </div>
+            </div>
+          </div>
         </div>
       </main>
     </div>
