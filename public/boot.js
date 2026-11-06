@@ -4,11 +4,6 @@
 // Suppress internal Roblox engine startup spam, benign settings warnings, and routine logs
 (function () {
   try {
-    try {
-      if (typeof window !== 'undefined') {
-        Object.defineProperty(window, 'WebTransport', { value: undefined, configurable: true, writable: true });
-      }
-    } catch (e) {}
     const _pats = [
       "[DIRECT KEY]",
       "[Direct Mouse",
@@ -180,8 +175,6 @@
     };
     console.error = function (...args) {
       if (_shouldSuppress(args)) return;
-      const s = ((args && args[0] ? (typeof args[0] === 'string' ? args[0] : (args[0].message || '')) : '') + '');
-      if (s.includes('[WASM-RNA]') || s.includes('WebTransport') || s.includes('[FLog::') || s.includes('[DFLog::') || s.includes('Squad.NetworkStatus') || s.includes('SchedulerHostConfig') || s.includes('WasmMultiplexedConnection')) return;
       return _oe.apply(console, args);
     };
     console.info = function (...args) {

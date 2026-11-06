@@ -233,24 +233,10 @@
     }
     const app = doc.applicationSettings;
     if (app) {
-      // Force native RakNet UDP directly and completely disable RNA / WebTransport
       app.FFlagUseRbxTransportClient3 = "False";
       app.FFlagUseRbxTransportServer = "False";
       app.DFFlagEnableReactiveGameJoin3 = "False";
       app.DFFlagEnableReactiveGameJoin4 = "False";
-      app.FFlagEnableWebTransport = "False";
-      app.DFFlagEnableWebTransport = "False";
-      app.FFlagUseWebTransport = "False";
-      app.DFFlagUseWebTransport = "False";
-      app.FFlagEnableRnaWebTransport = "False";
-      app.DFFlagEnableRnaWebTransport = "False";
-      app.FFlagEnableRna = "False";
-      app.DFFlagEnableRna = "False";
-      app.FFlagRbxTransportDummyClientEnabled = "False";
-      app.DFFlagRbxTransportDummyClientEnabled = "False";
-      app.DFIntRbxTransportDummyClientSampleRate = "0";
-      app.DFIntRbxTransportClientSampleRate = "0";
-      app.DFIntRbxTransportServerSampleRate = "0";
     }
     console.log("[rbxnet] Network mode: RakNet UDP over WS-UDP active (status " + r.status + ")");
     return new Response(JSON.stringify(doc), {
