@@ -96,26 +96,28 @@
 
     _ensureWebOverlay(mount = document.body) {
       if (this.overlay) return this.overlay;
-      const wrap = document.createElement("div");
-      wrap.id = "rbx-web-login-overlay";
-      wrap.className = "dark-theme builder-font local-menu login-page";
-      wrap.style.cssText = [
-        "position:fixed",
-        "inset:0",
-        "width:100vw",
-        "height:100vh",
-        "margin:0",
-        "padding:0",
-        "box-sizing:border-box",
-        "background-color:#191b1d",
-        "display:none",
-        "flex-direction:column",
-        "justify-content:space-between",
-        "align-items:center",
-        "z-index:999999",
-      ].join(";");
+      let wrap = document.getElementById("rbx-login-overlay") || document.getElementById("rbx-web-login-overlay");
+      if (!wrap) {
+        wrap = document.createElement("div");
+        wrap.id = "rbx-web-login-overlay";
+        wrap.className = "dark-theme builder-font local-menu login-page";
+        wrap.style.cssText = [
+          "position:fixed",
+          "inset:0",
+          "width:100vw",
+          "height:100vh",
+          "margin:0",
+          "padding:0",
+          "box-sizing:border-box",
+          "background-color:#191b1d",
+          "display:none",
+          "flex-direction:column",
+          "justify-content:space-between",
+          "align-items:center",
+          "z-index:999999",
+        ].join(";");
 
-      wrap.innerHTML = `
+        wrap.innerHTML = `
         <main class="login-main">
           <section class="login-card" aria-labelledby="login-title">
             <span class="login-mark icon-logo-r" aria-hidden="true"></span>
@@ -143,7 +145,8 @@
           <span>Roblox Web (unofficial)</span>
         </footer>
       `;
-      mount.appendChild(wrap);
+        mount.appendChild(wrap);
+      }
       this.overlay = wrap;
 
       const cookieInput = wrap.querySelector("#session-value");

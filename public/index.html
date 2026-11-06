@@ -1825,6 +1825,36 @@
     </div>
   </div>
 
+  <!-- Login Screen Overlay (Roblox Web Unofficial) -->
+  <div id="rbx-login-overlay" class="dark-theme builder-font local-menu login-page" style="display:none; position:fixed; inset:0; width:100vw; height:100vh; z-index:999998; overflow-y:auto;">
+    <main class="login-main">
+      <section class="login-card" aria-labelledby="login-title">
+        <span class="login-mark icon-logo-r" aria-hidden="true"></span>
+        <h1 id="login-title">Log in</h1>
+        
+        <div id="session-auth" class="login-method session-only">
+          <form id="session-form" method="post" action="/api/session" autocomplete="off">
+            <label for="session-value">.ROBLOSECURITY cookie</label>
+            <div class="session-input-wrap">
+              <input id="session-value" name="sessionValue" type="password" class="menu-input" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="12000" placeholder="Paste your session cookie" required="" />
+            </div>
+            <p class="field-error" id="login-error" role="alert" hidden=""></p>
+            <button class="btn-primary-md login-primary" id="session-submit" type="submit" disabled="">Log In</button>
+          </form>
+        </div>
+        <div id="current-session" class="current-session" hidden="">
+          <span id="current-account"></span>
+          <button class="btn-secondary-md" id="continue-session">Continue</button>
+          <button class="btn-secondary-md" id="logout-session">Log Out</button>
+        </div>
+      </section>
+    </main>
+    <footer class="login-page-footer">
+      <p class="login-session-purpose">We require your .ROBLOSECURITY cookie to authenticate your account with roblox and join experiences.</p>
+      <span>Roblox Web (unofficial)</span>
+    </footer>
+  </div>
+
 </body>
 
 </html>
