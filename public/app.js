@@ -61,7 +61,7 @@
     if (typeof window.createWebClient !== "function" && !document.getElementById("preload-webclient-js")) {
       const s = document.createElement("script");
       s.id = "preload-webclient-js";
-      s.src = "/engine/WebClient.js";
+      s.src = "/engine/WebClient.js?v=20261105v1";
       s.async = true;
       document.head.appendChild(s);
     }

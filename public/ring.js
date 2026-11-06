@@ -46,7 +46,6 @@
     u8 = new Uint8Array(m.buffer);
     u32 = new Uint32Array(m.buffer);
     Atomics.store(i32, MAGIC >> 2, MAGIC_VALUE);
-    log("shared memory captured, " + m.buffer.byteLength + " B");
     pumpLoop();
   }
 

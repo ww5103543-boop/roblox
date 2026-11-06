@@ -4,165 +4,36 @@
 // Suppress internal Roblox engine startup spam, benign settings warnings, and routine logs
 (function () {
   try {
-    const _pats = [
-      "[DIRECT KEY]",
-      "[Direct Mouse",
-      "DIRECT KEY",
-      "Direct Mouse",
-      "Tick ",
-      "(input drops total:",
-      " created",
-      "[channel]",
-      "[wasm-cors]",
-      "Wrap-deformer",
-      "Hidden Surface Removal",
-      "texParameter",
-      "INVALID_OPERATION",
-      "Gamepad API",
-      "isTouchDevice",
-      "isTouchScreenDevice",
-      "isKeyboardDevice",
-      "isMouseDevice",
-      "initialize returned",
-      "launchUGCGame",
-      "[FMOD]",
-      "touchOnly",
-      "Canvas:",
-      "main loop",
-      "[LIFECYCLE]",
-      "serving cached join-game response",
-      "Replicator created",
-      "Time taken to initialize schema",
-      "Assigned peer id",
-      "[onServiceProvider]",
-      "Join snapshot timer",
-      "OTAPollingEnabled",
-      "ClientWeatherBootstrapper",
-      "Server RobloxGitHash",
-      "Server Prefix",
-      "[_UniversalAppPatch]",
-      "[_InExperiencePatch]",
-      "STARTING EMOTE",
-      "com_outfits_exp_grp",
-      "Notifications when exceeding max accessories",
-      "asset_button_options_layout",
-      "Successfully Loaded Catalog",
-      "Welcome to Catalog Avatar Creator",
-      "Recommended Community Outfits",
-      "GetBatchItemDetails",
-      "429 Too Many Requests",
-      "Too Many Requests",
-      "MeshContentProvider",
-      "[WASM-TIMING]",
-      "[WASM-JSPI]",
-      "[WASM-RNA]",
-      "[FLog::",
-      "[DFLog::",
-      "[pthread]",
-      "Available WebGL Extensions:",
-      "- EXT_",
-      "- OES_",
-      "- WEBGL_",
-      "- KHR_",
-      "- NV_",
-      "GL Vendor",
-      "GLSL version",
-      "Ext: ",
-      "handleConnectErrorFromJs",
-      "WebTransport",
-      "WasmMultiplexedConnection",
-      "All use of Roblox services must comply",
-      "RobloxGitHash:",
-      "The base url is",
-      "The channel is",
-      "Base URL:",
-      "Base Host:",
-      "Wasm Memory Bytes =",
-      "Registered ",
-      "No prefetch:",
-      "heartbeat #",
-      "Redirecting WebWorker",
-      "audio-processor-fast.js",
-      "WebClient.js",
-      "Hello world",
-      "Hello again",
-      "RbxStorage",
-      "UserGameSettings",
-      "Squad.NetworkStatus",
-      "useSquadState",
-      "SettingsHub",
-      "LocalStorageHandler",
-      "LocalStorageManager",
-      "Asset is not approved",
-      "Synchronous JavaScript allocator",
-      "rectBackgroundWhite",
-      "Slider/Left",
-      "Slider/Less",
-      "DropDown/DropDown",
-      "stream == nullptr",
-      "Invalid image or texture",
-      "[CookiePool]",
-      "[IXP]",
-      "[Flags]",
-      "pixel ratio change observed",
-      "GetServerChannelRemote not available",
-      "Cache clean process failed to get available space",
-      "Function not implemented",
-      "PeerMonotonicClock",
-      "DisplayCatalogPages ProjectedItems",
-      "DraggableNPCVPF",
-      "WorldModel.NPC.Animate",
-      "WorldModel.Player.Animate",
-      "FeaturedAnimationPackRenderTile",
-      "SavedOutfitsV3",
-      "CommunityOutfits",
-      "CatalogGUI",
-      "$func",
-      "@ WebClient.wasm",
-      "Temporary Id found in HSR data",
-      "Mesh Id does not match",
-      "Asset (Animation)",
-      "Animation failed to load",
-      "AssetResolutionWorkflow",
-      "AssetDelivery403InvalidPermission",
-      "User is not authorized to access Asset",
-      "Error caught by React",
-      "SquadsCore",
-      "installReducer",
-      "status:429"
+    const ALLOWED_EXACT_PREFIXES = [
+      "[rkring] ring seam installed",
+      "[app] WebClient.wasm precompiled in background",
+      "Loading WasmPlayer: Engine Base URL is",
+      "Loading WasmPlayer: Page Base URL is",
+      "[auth]",
+      "[rbxnet]",
+      "[rkring] WS-UDP open",
     ];
+
     const _shouldSuppress = (args) => {
       if (!args || args.length === 0) return true;
-      for (let i = 0; i < args.length; i++) {
-        const a = args[i];
-        if (typeof a === "string") {
-          const s = a.trim();
-          if (!s) return true;
-          if (s === "created" || s.endsWith("created")) return true;
-          if (s.startsWith("[DIRECT KEY]") || s.includes("[DIRECT KEY]") || s.includes("DIRECT KEY")) return true;
-          if (s.startsWith("[Direct Mouse") || s.includes("Direct Mouse")) return true;
-          if (s.startsWith("Tick ") && s.includes("took")) return true;
-          if (s.length <= 2 && /^[wasdWASD0-9\-_]+$/.test(s)) return true;
-          if (/^(starting|started)\b/i.test(s) && !s.includes("[auth]") && !s.includes("[rkring]")) return true;
-          if (s.includes("w (error)") || s.includes("w(error)")) return true;
-          for (let j = 0; j < _pats.length; j++) {
-            if (s.includes(_pats[j])) return true;
-          }
-        } else if (a && typeof a === "object") {
-          const m = ((a.message || a.error || a.reason || "") + "").trim();
-          if (!m) continue;
-          if (m.startsWith("[DIRECT KEY]") || m.includes("DIRECT KEY")) return true;
-          if (m.startsWith("[Direct Mouse") || m.includes("Direct Mouse")) return true;
-          if (m.startsWith("Tick ") && m.includes("took")) return true;
-          if (m.length <= 2 && /^[wasdWASD0-9\-_]+$/.test(m)) return true;
-          if (m.includes("w (error)") || m.includes("w(error)")) return true;
-          for (let j = 0; j < _pats.length; j++) {
-            if (m.includes(_pats[j])) return true;
-          }
+      const first = args[0];
+      let s = "";
+      if (typeof first === "string") {
+        s = first.trim();
+      } else if (first && typeof first === "object") {
+        s = ((first.message || first.error || first.reason || "") + "").trim();
+      }
+      if (!s) return true;
+
+      // Allow only the clean high-level start logs
+      for (let i = 0; i < ALLOWED_EXACT_PREFIXES.length; i++) {
+        if (s.startsWith(ALLOWED_EXACT_PREFIXES[i])) {
+          return false;
         }
       }
-      return false;
+      return true;
     };
+
     window.__shouldSuppressLog = _shouldSuppress;
     const _ol = console.log, _ow = console.warn, _oe = console.error, _oi = console.info, _od = console.debug;
     console.log = function (...args) {
