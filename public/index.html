@@ -170,40 +170,58 @@
       min-height: 54px;
       background: var(--tn-bg-dark);
       border-bottom: 1px solid var(--tn-border);
-      display: grid;
-      grid-template-columns: auto 1fr auto;
+      display: flex;
       align-items: center;
       padding: 0 20px;
-      gap: 14px;
+      gap: 18px;
       z-index: 65;
     }
 
     .rbx-top-left {
       display: flex;
       align-items: center;
-      justify-self: start;
+      flex-shrink: 0;
     }
 
     .rbx-logo-btn {
       display: flex;
       align-items: center;
-      gap: 8px;
-      height: 36px;
+      gap: 9px;
+      height: 38px;
       background: transparent;
       border: none;
       cursor: pointer;
       color: var(--tn-fg-bright);
       padding: 0 4px;
-      font-size: 18px;
+      text-decoration: none;
+      transition: opacity 0.15s ease;
+    }
+
+    .rbx-logo-btn:hover {
+      opacity: 0.85;
+    }
+
+    .rbx-logo-text {
+      font-family: "Builder Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 21px;
       font-weight: 800;
-      letter-spacing: 0.3px;
+      letter-spacing: -0.2px;
+      color: var(--tn-fg-bright);
+      user-select: none;
+      line-height: 1;
+    }
+
+    @media (max-width: 600px) {
+      .rbx-logo-text {
+        display: none;
+      }
     }
 
     /* Balanced Search Bar */
     .rbx-search-container {
-      width: 200%;
-      max-width: 1037px;
-      justify-self: right;
+      flex: 1;
+      max-width: 620px;
+      margin: 0;
     }
 
     .rbx-search-box {
@@ -256,7 +274,7 @@
     .rbx-top-right {
       display: flex;
       align-items: center;
-      justify-self: end;
+      margin-left: auto;
       gap: 10px;
       position: relative;
     }
@@ -1224,6 +1242,7 @@
           <svg width="28" height="28" viewBox="0 0 56 56" fill="currentColor">
             <path fill-rule="evenodd" d="M11.676 0 0 44.166 43.577 56l11.676-44.166zm20.409 35.827-12.177-3.308 3.264-12.342 12.182 3.308z"/>
           </svg>
+          <span class="rbx-logo-text">ROBLOX</span>
         </button>
       </div>
 

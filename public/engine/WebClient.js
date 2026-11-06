@@ -33,6 +33,59 @@
     console.error = function(...a){ if (_check(a)) return; return _oe.apply(console, a); };
     console.info = function(...a){ if (_check(a)) return; return _oi.apply(console, a); };
   } catch(e) {}
+  try {
+    const _pats = [
+      "Hello world",
+      "Hello again",
+      "RbxStorage",
+      "UserGameSettings",
+      "[FLog::Graphics]",
+      "GL Vendor",
+      "GLSL version",
+      "Ext: ",
+      "handleConnectErrorFromJs",
+      "[WASM-RNA]",
+      "WebTransport",
+      "WasmMultiplexedConnection",
+      "[DFLog::HttpTraceError]",
+      "[DFLog::RbxTransportDummyClient]",
+      "All use of Roblox services must comply",
+      "RobloxGitHash:",
+      "The base url is",
+      "The channel is",
+      "Squad.NetworkStatus",
+      "useSquadState",
+      "SettingsHub",
+      "LocalStorageHandler",
+      "LocalStorageManager",
+      "Asset is not approved",
+      "MeshContentProvider failed",
+      "Synchronous JavaScript allocator",
+      "rectBackgroundWhite.png",
+      "Slider/Left.png",
+      "Slider/Less.png",
+      "DropDown/DropDown.png"
+    ];
+    const _check = (args) => {
+      for (let i = 0; i < args.length; i++) {
+        const a = args[i];
+        if (typeof a === "string") {
+          for (let j = 0; j < _pats.length; j++) if (a.includes(_pats[j])) return true;
+        } else if (a && typeof a === "object") {
+          const m = a.message || a.error || "";
+          if (typeof m === "string") {
+            for (let j = 0; j < _pats.length; j++) if (m.includes(_pats[j])) return true;
+          }
+        }
+      }
+      return false;
+    };
+    const _ol = console.log, _ow = console.warn, _oe = console.error, _oi = console.info;
+    console.log = function (...a) { if (_check(a)) return; return _ol.apply(console, a); };
+    console.warn = function (...a) { if (_check(a)) return; return _ow.apply(console, a); };
+    console.error = function (...a) { if (_check(a)) return; return _oe.apply(console, a); };
+    console.info = function (...a) { if (_check(a)) return; return _oi.apply(console, a); };
+  } catch (e) {}
   if (typeof importScripts !== "function") return;
   if (typeof trustedTypes !== "undefined") {
     try {
