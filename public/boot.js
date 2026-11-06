@@ -104,7 +104,32 @@
       "[CookiePool]",
       "[IXP]",
       "[Flags]",
-      "pixel ratio change observed"
+      "pixel ratio change observed",
+      "GetServerChannelRemote not available",
+      "Cache clean process failed to get available space",
+      "Function not implemented",
+      "PeerMonotonicClock",
+      "DisplayCatalogPages ProjectedItems",
+      "DraggableNPCVPF",
+      "WorldModel.NPC.Animate",
+      "WorldModel.Player.Animate",
+      "FeaturedAnimationPackRenderTile",
+      "SavedOutfitsV3",
+      "CommunityOutfits",
+      "CatalogGUI",
+      "$func",
+      "@ WebClient.wasm",
+      "Temporary Id found in HSR data",
+      "Mesh Id does not match",
+      "Asset (Animation)",
+      "Animation failed to load",
+      "AssetResolutionWorkflow",
+      "AssetDelivery403InvalidPermission",
+      "User is not authorized to access Asset",
+      "Error caught by React",
+      "SquadsCore",
+      "installReducer",
+      "status:429"
     ];
     const _shouldSuppress = (args) => {
       if (!args || args.length === 0) return true;
@@ -223,27 +248,33 @@ try {
 
 // Guard WebGL texParameter when no texture is bound to prevent INVALID_OPERATION warnings
 try {
-  if (typeof WebGL2RenderingContext !== "undefined") {
-    const origBindTexture = WebGL2RenderingContext.prototype.bindTexture;
-    const origTexParameteri = WebGL2RenderingContext.prototype.texParameteri;
-    const origTexParameterf = WebGL2RenderingContext.prototype.texParameterf;
-
-    WebGL2RenderingContext.prototype.bindTexture = function (target, texture) {
-      this._boundTextures = this._boundTextures || new Map();
-      this._boundTextures.set(target, texture);
-      return origBindTexture.call(this, target, texture);
-    };
-
-    WebGL2RenderingContext.prototype.texParameteri = function (target, pname, param) {
-      if (this._boundTextures && !this._boundTextures.get(target)) return;
+  const BINDING_MAP = {
+    0x0DE1: 0x8069, // TEXTURE_2D -> TEXTURE_BINDING_2D
+    0x8C1A: 0x8C1D, // TEXTURE_2D_ARRAY -> TEXTURE_BINDING_2D_ARRAY
+    0x806F: 0x806A, // TEXTURE_3D -> TEXTURE_BINDING_3D
+    0x8513: 0x8514  // TEXTURE_CUBE_MAP -> TEXTURE_BINDING_CUBE_MAP
+  };
+  function guardTexParams(proto) {
+    if (!proto || !proto.texParameteri) return;
+    const origTexParameteri = proto.texParameteri;
+    const origTexParameterf = proto.texParameterf;
+    proto.texParameteri = function (target, pname, param) {
+      const q = BINDING_MAP[target];
+      if (q) {
+        try { if (!this.getParameter(q)) return; } catch (e) {}
+      }
       return origTexParameteri.call(this, target, pname, param);
     };
-
-    WebGL2RenderingContext.prototype.texParameterf = function (target, pname, param) {
-      if (this._boundTextures && !this._boundTextures.get(target)) return;
+    proto.texParameterf = function (target, pname, param) {
+      const q = BINDING_MAP[target];
+      if (q) {
+        try { if (!this.getParameter(q)) return; } catch (e) {}
+      }
       return origTexParameterf.call(this, target, pname, param);
     };
   }
+  if (typeof WebGL2RenderingContext !== "undefined") guardTexParams(WebGL2RenderingContext.prototype);
+  if (typeof WebGLRenderingContext !== "undefined") guardTexParams(WebGLRenderingContext.prototype);
 } catch (e) {}
 
 // require-trusted-types-for 'script' rejects a plain string on script.src,

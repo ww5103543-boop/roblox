@@ -1227,7 +1227,7 @@
       if (existing) {
         window.__whoami = existing;
         localStorage.setItem("weblox_user_logged_in", "1");
-        if (topbar) topbar.style.display = "grid";
+        if (topbar) topbar.style.display = "flex";
         bodyWrap.style.display = "flex";
         loadUserAndFriendsData(auth, existing);
         return existing;
@@ -1244,7 +1244,7 @@
     const who = await auth.interactiveLogin(30 * 60 * 1000, 0);
     window.__whoami = who;
     localStorage.setItem("weblox_user_logged_in", "1");
-    if (topbar) topbar.style.display = "grid";
+    if (topbar) topbar.style.display = "flex";
     bodyWrap.style.display = "flex";
     loadUserAndFriendsData(auth, who);
     return who;
@@ -1373,7 +1373,7 @@
         who = await auth.injectCookie(cfg.cookie);
         window.__whoami = who;
         localStorage.setItem("weblox_user_logged_in", "1");
-        if (topbar) topbar.style.display = "grid";
+        if (topbar) topbar.style.display = "flex";
         bodyWrap.style.display = "flex";
         loadUserAndFriendsData(auth, who);
       } catch (e) {}

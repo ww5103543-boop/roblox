@@ -171,14 +171,15 @@
       max-height: 54px;
       background: var(--tn-bg-dark);
       border-bottom: 1px solid var(--tn-border);
-      display: flex;
-      flex-direction: row;
+      display: flex !important;
+      flex-direction: row !important;
       flex-wrap: nowrap !important;
-      align-items: center;
+      align-items: center !important;
       padding: 0 16px;
       gap: 16px;
       z-index: 65;
       box-sizing: border-box;
+      overflow: hidden;
     }
 
     .rbx-top-left {
@@ -199,6 +200,7 @@
       padding: 0 4px;
       text-decoration: none;
       transition: opacity 0.15s ease;
+      flex-shrink: 0;
     }
 
     .rbx-logo-btn:hover {
@@ -213,6 +215,7 @@
       color: var(--tn-fg-bright);
       user-select: none;
       line-height: 1;
+      white-space: nowrap;
     }
 
     @media (max-width: 600px) {
@@ -228,8 +231,8 @@
 
     /* Balanced Search Bar */
     .rbx-search-container {
-      flex: 0 1 320px;
-      max-width: 320px;
+      flex: 0 1 360px;
+      max-width: 360px;
       min-width: 140px;
       margin: 0;
     }

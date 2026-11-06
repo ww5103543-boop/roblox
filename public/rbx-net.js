@@ -159,9 +159,20 @@
     if (recent.length > 300) recent.shift();
   }
 
+  const _catalogCache = new Map();
+
   async function rbxRequest(url, init) {
     if (isTelemetry(url)) {
       return { status: 200, url, headers: { "content-type": "application/json" }, body: "e30=" };
+    }
+    const isCatalog = url.includes("catalog.roblox.com");
+    let cacheKey = "";
+    if (isCatalog) {
+      cacheKey = url + "|" + (init && init.body ? String(init.body) : "");
+      const cached = _catalogCache.get(cacheKey);
+      if (cached && (Date.now() - cached.time < 60000)) {
+        return cached.res;
+      }
     }
     const encoded = await encodeInit(init);
     let res;
@@ -181,8 +192,22 @@
         res = await viaChannel(url, encoded);
       }
     } catch (e) {
+      if (isCatalog) {
+        const cached = _catalogCache.get(cacheKey);
+        if (cached) return cached.res;
+        return { status: 200, url, headers: { "content-type": "application/json" }, body: btoa(JSON.stringify({ data: [] })) };
+      }
       note(url, encoded.method, 0, isPage ? "page" : "worker", e && e.message);
       throw e;
+    }
+    if (isCatalog) {
+      if (res.status === 200) {
+        _catalogCache.set(cacheKey, { res, time: Date.now() });
+      } else if (res.status === 429) {
+        const cached = _catalogCache.get(cacheKey);
+        if (cached) return cached.res;
+        res = { status: 200, url, headers: { "content-type": "application/json" }, body: btoa(JSON.stringify({ data: [] })) };
+      }
     }
     note(url, encoded.method, res.status, isPage ? "page" : "worker");
     return res;
@@ -212,6 +237,14 @@
       app.FFlagUseRbxTransportServer = "False";
       app.DFFlagEnableReactiveGameJoin3 = "False";
       app.DFFlagEnableReactiveGameJoin4 = "False";
+      app.DFIntRbxStorageInitHundredthsPercent = "0";
+      app.DFIntRbxStorageErrorLogHundredthsPercent = "0";
+      app.FLogLocalStorage = "0";
+      app.FFlagForceEnableSquad = "False";
+      app.FFlagIsSquadLobbySessionEnabled = "False";
+      app.FLogGameJoinUtil = "7";
+      app.FLogGameJoinV2 = "7";
+      app.FLogUgcExperienceController = "7";
     }
     console.log("[rbxnet] Network mode: RakNet UDP over WS-UDP active (status " + r.status + ")");
     return new Response(JSON.stringify(doc), {

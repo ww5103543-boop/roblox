@@ -515,7 +515,7 @@
     visible(on, topOffsetPx = 0) {
       const topbar = document.getElementById("rbx-topbar");
       if (topbar) {
-        topbar.style.display = on ? "none" : "grid";
+        topbar.style.display = on ? "none" : "flex";
       }
       if (!IS_IWA) {
         this._ensureWebOverlay();

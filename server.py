@@ -563,7 +563,7 @@ class InsomniacHandler(BaseHTTPRequestHandler):
         self.send_header("access-control-allow-credentials", "true")
         self.send_header("access-control-allow-headers", "content-type, authorization, x-session-id")
         self.send_header("access-control-expose-headers", "x-session-id")
-        self.send_header("cache-control", "public, max-age=86400" if cacheable else "no-store")
+        self.send_header("cache-control", "public, max-age=86400" if cacheable else "no-cache, no-store, must-revalidate")
         if sid:
             self.send_header("set-cookie", f"insomniac_sid={sid}; Path=/; SameSite=Lax; Max-Age=31536000")
             self.send_header("x-session-id", sid)
@@ -722,9 +722,10 @@ class InsomniacHandler(BaseHTTPRequestHandler):
                 self._respond(404, "text/plain", b"not found", False)
                 return
 
-        is_engine = rel.startswith("engine/") and not rel.endswith("WasmPlayer.js")
-        body = read_cached(file, is_engine)
-        self._respond(200, content_type(file), body, is_engine, is_new_sid=is_new, sid=sess.sid)
+        is_script = file.suffix.lower() in (".js", ".json", ".html")
+        cacheable = rel.startswith("engine/") and not is_script
+        body = read_cached(file, cacheable)
+        self._respond(200, content_type(file), body, cacheable, is_new_sid=is_new, sid=sess.sid)
 
     def do_POST(self):
         parsed = urlparse(self.path)
