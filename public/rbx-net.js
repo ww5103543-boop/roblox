@@ -233,56 +233,10 @@
     }
     const app = doc.applicationSettings;
     if (app) {
-      // Transport: enforce RakNet over UDP via WS relay
       app.FFlagUseRbxTransportClient3 = "False";
       app.FFlagUseRbxTransportServer = "False";
       app.DFFlagEnableReactiveGameJoin3 = "False";
       app.DFFlagEnableReactiveGameJoin4 = "False";
-
-      // Gray sky (disable skybox and clouds computation)
-      app.FFlagDebugSkyGray = "True";
-      app.DFFlagDebugSkyGray = "True";
-      app.FFlagFixBlackSky2 = "True";
-      app.FFlagDebugForceFutureIsBrightPhase3 = "False";
-      app.FFlagDebugForceFutureIsBrightPhase2 = "False";
-      app.FFlagDebugForceFutureIsBrightPhase1 = "False";
-
-      // Texture reduction / potato textures (lowest texture lag)
-      app.FIntDebugTextureManagerSkipMips = "3";
-      app.DFIntDebugTextureManagerSkipMips = "3";
-      app.FIntDebugAdditionalNumberOfMipsToSkipForNonAlbedoTextures = "3";
-      app.FIntRenderTextureMipBias = "2000";
-      app.FIntDebugFRMQualityLevelOverride = "1";
-
-      // Anti-lag and performance
-      app.DFIntTaskSchedulerTargetFps = "240";
-      app.FFlagTaskSchedulerLimitTargetFpsTo2402 = "True";
-      app.DFIntGraphicsOptimizationMode = "1";
-      app.FFlagEnableReducedLatency = "True";
-      app.DFIntTargetTimeDelayFacctorTenths = "0";
-      app.FFlagDisablePostFx = "True";
-      app.FFlagDisableShadows = "True";
-      app.FFlagDisableBloom = "True";
-      app.FFlagDisableDepthOfField = "True";
-
-      // Silence internal C++ engine logs
-      app.FLogLocalStorage = "0";
-      app.FLogGameJoinUtil = "0";
-      app.FLogGameJoinV2 = "0";
-      app.FLogUgcExperienceController = "0";
-      app.FLogNetwork = "0";
-      app.DFLogNetworkClient = "0";
-      app.DFLogKeyRing = "0";
-      app.FLogOutput = "0";
-      app.FLogGameJoinLoadTime = "0";
-      app.FLogSessionTransitionFSM = "0";
-      app.FLogCreatorWarning = "0";
-      app.FLogCreatorError = "0";
-      app.FLogCreatorOutput = "0";
-      app.DFIntRbxStorageInitHundredthsPercent = "0";
-      app.DFIntRbxStorageErrorLogHundredthsPercent = "0";
-      app.FFlagForceEnableSquad = "False";
-      app.FFlagIsSquadLobbySessionEnabled = "False";
     }
     console.log("[rbxnet] Network mode: RakNet UDP over WS-UDP active (status " + r.status + ")");
     return new Response(JSON.stringify(doc), {

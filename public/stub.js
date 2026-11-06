@@ -33,5 +33,5 @@
     }
   }
   const src = new URL(location.href).searchParams.get("src");
-  importScripts(src || location.origin + "/engine/WebClient.js?v=20261105v1");
+  importScripts(src || location.origin + "/engine/WebClient.js");
 })();
