@@ -61,7 +61,7 @@
     if (typeof window.createWebClient !== "function" && !document.getElementById("preload-webclient-js")) {
       const s = document.createElement("script");
       s.id = "preload-webclient-js";
-      s.src = "/engine/WebClient.js?v=20261105v1";
+      s.src = "/engine/WebClient.js?v=20261106v2";
       s.async = true;
       document.head.appendChild(s);
     }
@@ -1246,7 +1246,7 @@
     // 3. Boot WasmPlayer.js immediately at 0ms
     window._wasmLoaded = true;
     const s = document.createElement("script");
-    s.src = "/engine/WasmPlayer.js";
+    s.src = "/engine/WasmPlayer.js?v=20261106v2";
     s.onerror = () => {
       isLaunching = false;
       shell.style.display = "flex";
