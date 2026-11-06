@@ -8,24 +8,29 @@ window.__wasmLoaderContext = {
   workerStubUrl: location.origin + "/stub.js",
 };
 
-// Filter misleading Roblox internal engine logs that use "Critical" channel levels for routine startup logs
-const _origWarn = console.warn;
-console.warn = function (...args) {
-  const msg = typeof args[0] === "string" ? args[0] : "";
-  if (msg.includes("[DFLog::RbxStorage] RbxStorage::init")) {
-    return console.debug(...args);
-  }
-  return _origWarn.apply(console, args);
-};
-
-const _origError = console.error;
-console.error = function (...args) {
-  const msg = typeof args[0] === "string" ? args[0] : "";
-  if (msg.includes("[DFLog::RbxStorage] RbxStorage::init")) {
-    return console.debug(...args);
-  }
-  return _origError.apply(console, args);
-};
+// Ensure Roblox engine uses RakNet over UDP (via ring.js) instead of failing WebTransport (RNA)
+try {
+  delete window.WebTransport;
+  delete globalThis.WebTransport;
+} catch (e) {}
+try {
+  Object.defineProperty(window, "WebTransport", {
+    value: undefined,
+    writable: false,
+    configurable: true,
+  });
+} catch (e) {
+  window.WebTransport = undefined;
+}
+try {
+  Object.defineProperty(globalThis, "WebTransport", {
+    value: undefined,
+    writable: false,
+    configurable: true,
+  });
+} catch (e) {
+  globalThis.WebTransport = undefined;
+}
 
 // require-trusted-types-for 'script' rejects a plain string on script.src,
 // new Worker(...) and importScripts(). A policy named "default" is applied to

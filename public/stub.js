@@ -6,6 +6,25 @@
 // does not cross realms, and importScripts is a sink in this one.
 ;
 (function () {
+  try {
+    delete self.WebTransport;
+    delete globalThis.WebTransport;
+  } catch (e) {}
+  try {
+    Object.defineProperty(self, "WebTransport", {
+      value: undefined,
+      writable: false,
+      configurable: true,
+    });
+  } catch (e) {}
+  try {
+    Object.defineProperty(globalThis, "WebTransport", {
+      value: undefined,
+      writable: false,
+      configurable: true,
+    });
+  } catch (e) {}
+
   if (typeof trustedTypes !== "undefined") {
     try {
       trustedTypes.createPolicy("default", { createScriptURL: (url) => url });
