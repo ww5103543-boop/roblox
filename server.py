@@ -665,24 +665,32 @@ class InsomniacHandler(BaseHTTPRequestHandler):
 
         if not file.is_file():
             if rel.startswith("engine/"):
-                cdn_sub = rel[len("engine/"):]
-                cdn_url = f"https://setup.rbxcdn.com/webclient/version-75f1039cb4964863-RobloxWebClient/{cdn_sub}"
-                try:
-                    c_req = urllib.request.Request(cdn_url, headers={"User-Agent": "Roblox/WinInet"})
-                    with urllib.request.urlopen(c_req, context=_SSL_CTX, timeout=8.0) as c_resp:
-                        if c_resp.status == 200:
-                            data = c_resp.read()
-                            try:
-                                file.parent.mkdir(parents=True, exist_ok=True)
-                                file.write_bytes(data)
-                            except Exception:
-                                pass
-                            self._respond(200, content_type(file), data, True, is_new_sid=is_new, sid=sess.sid)
-                            return
-                except Exception:
-                    pass
-            self._respond(404, "text/plain", b"not found", False)
-            return
+                sub = rel[len("engine/"):]
+                for prefix in ("engine/content/", "engine/ExtraContent/", "engine/PlatformContent/"):
+                    cand = (ROOT / prefix / sub).resolve()
+                    if cand.is_file():
+                        file = cand
+                        break
+                if not file.is_file():
+                    for try_sub in (sub, f"content/{sub}"):
+                        cdn_url = f"https://setup.rbxcdn.com/webclient/version-75f1039cb4964863-RobloxWebClient/{try_sub}"
+                        try:
+                            c_req = urllib.request.Request(cdn_url, headers={"User-Agent": "Roblox/WinInet"})
+                            with urllib.request.urlopen(c_req, context=_SSL_CTX, timeout=8.0) as c_resp:
+                                if c_resp.status == 200:
+                                    data = c_resp.read()
+                                    try:
+                                        file.parent.mkdir(parents=True, exist_ok=True)
+                                        file.write_bytes(data)
+                                    except Exception:
+                                        pass
+                                    self._respond(200, content_type(file), data, True, is_new_sid=is_new, sid=sess.sid)
+                                    return
+                        except Exception:
+                            continue
+            if not file.is_file():
+                self._respond(404, "text/plain", b"not found", False)
+                return
 
         is_engine = rel.startswith("engine/") and not rel.endswith("WasmPlayer.js")
         body = read_cached(file, is_engine)

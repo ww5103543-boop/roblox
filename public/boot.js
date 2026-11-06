@@ -1,6 +1,79 @@
 // boot.js — the globals the engine loader expects before it runs, plus the one
 // line the IWA policy forces on us.
 
+// Suppress internal Roblox engine startup spam, benign settings warnings, and routine logs
+(function () {
+  try {
+    const _pats = [
+      "Hello world",
+      "Hello again",
+      "RbxStorage",
+      "UserGameSettings",
+      "[FLog::Graphics]",
+      "GL Vendor",
+      "GLSL version",
+      "Ext: ",
+      "handleConnectErrorFromJs",
+      "[WASM-RNA]",
+      "WebTransport",
+      "WasmMultiplexedConnection",
+      "[DFLog::HttpTraceError]",
+      "[DFLog::RbxTransportDummyClient]",
+      "All use of Roblox services must comply",
+      "RobloxGitHash:",
+      "The base url is",
+      "The channel is",
+      "Squad.NetworkStatus",
+      "useSquadState",
+      "SettingsHub",
+      "LocalStorageHandler",
+      "LocalStorageManager",
+      "Asset is not approved",
+      "MeshContentProvider failed",
+      "Synchronous JavaScript allocator",
+      "rectBackgroundWhite.png",
+      "Slider/Left.png",
+      "Slider/Less.png",
+      "DropDown/DropDown.png"
+    ];
+    const _shouldSuppress = (args) => {
+      for (let i = 0; i < args.length; i++) {
+        const a = args[i];
+        if (typeof a === "string") {
+          for (let j = 0; j < _pats.length; j++) {
+            if (a.includes(_pats[j])) return true;
+          }
+        } else if (a && typeof a === "object") {
+          const m = a.message || a.error || "";
+          if (typeof m === "string") {
+            for (let j = 0; j < _pats.length; j++) {
+              if (m.includes(_pats[j])) return true;
+            }
+          }
+        }
+      }
+      return false;
+    };
+    const _ol = console.log, _ow = console.warn, _oe = console.error, _oi = console.info;
+    console.log = function (...args) {
+      if (_shouldSuppress(args)) return;
+      return _ol.apply(console, args);
+    };
+    console.warn = function (...args) {
+      if (_shouldSuppress(args)) return;
+      return _ow.apply(console, args);
+    };
+    console.error = function (...args) {
+      if (_shouldSuppress(args)) return;
+      return _oe.apply(console, args);
+    };
+    console.info = function (...args) {
+      if (_shouldSuppress(args)) return;
+      return _oi.apply(console, args);
+    };
+  } catch (e) {}
+})();
+
 window.__wasmLoaderContext = {
   engineBase: location.origin + "/engine",
   server: "prod",
