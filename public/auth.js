@@ -266,7 +266,9 @@
         const check = async () => {
           const r = await fetch("/api/rbx/whoami", { cache: "no-store" });
           if (!r.ok) return null;
-          return await r.json();
+          const data = await r.json();
+          if (data && data.id) return data;
+          return null;
         };
         let user = await check().catch(() => null);
         if (!user && document.documentElement.dataset.webloxExt === "1") {

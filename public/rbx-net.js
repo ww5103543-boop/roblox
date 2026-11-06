@@ -33,7 +33,12 @@
     "tracers.roblox.com",
   ]);
 
-  const isTelemetry = (url) => TELEMETRY.has(hostOf(url));
+  const isTelemetry = (url) => {
+    const host = hostOf(url);
+    if (TELEMETRY.has(host)) return true;
+    if (typeof url === "string" && (url.includes("/experience-signals-ingest/") || url.includes("/telemetry/"))) return true;
+    return false;
+  };
 
   const isRoblox = (url) => {
     const host = hostOf(url);

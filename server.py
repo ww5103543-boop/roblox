@@ -571,7 +571,7 @@ class InsomniacHandler(BaseHTTPRequestHandler):
         if parsed.path == "/api/rbx/whoami":
             cookie = sess.cookie or clean_cookie_value(DEFAULT_COOKIE)
             if not cookie:
-                self._respond_json(401, {"ok": False, "user": None}, is_new_sid=is_new, sid=sess.sid)
+                self._respond_json(200, {"ok": False, "user": None}, is_new_sid=is_new, sid=sess.sid)
                 return
             status, _, _, data, new_csrf = rbx_http_call(
                 "https://users.roblox.com/v1/users/authenticated",
@@ -588,7 +588,7 @@ class InsomniacHandler(BaseHTTPRequestHandler):
                     return
                 except Exception:
                     pass
-            self._respond_json(401, {"ok": False, "user": None}, is_new_sid=is_new, sid=sess.sid)
+            self._respond_json(200, {"ok": False, "user": None}, is_new_sid=is_new, sid=sess.sid)
             return
 
         if parsed.path in ("/config.json", "/config"):

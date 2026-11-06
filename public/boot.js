@@ -32,13 +32,62 @@ try {
   globalThis.WebTransport = undefined;
 }
 
+// Auto-resume AudioContext on user interaction so audio plays without warning
+try {
+  const _RealAudioContext = window.AudioContext || window.webkitAudioContext;
+  if (_RealAudioContext) {
+    const activeContexts = [];
+    const resumeAll = () => {
+      for (const ctx of activeContexts) {
+        if (ctx.state === "suspended") {
+          ctx.resume().catch(() => {});
+        }
+      }
+    };
+    ["click", "keydown", "pointerdown", "touchstart"].forEach((evt) => {
+      window.addEventListener(evt, resumeAll, { passive: true, capture: true });
+    });
+    window.AudioContext = class extends _RealAudioContext {
+      constructor(...args) {
+        super(...args);
+        activeContexts.push(this);
+      }
+    };
+    if (window.webkitAudioContext) {
+      window.webkitAudioContext = window.AudioContext;
+    }
+  }
+} catch (e) {}
+
+// Guard WebGL texParameter when no texture is bound to prevent INVALID_OPERATION warnings
+try {
+  if (typeof WebGL2RenderingContext !== "undefined") {
+    const origBindTexture = WebGL2RenderingContext.prototype.bindTexture;
+    const origTexParameteri = WebGL2RenderingContext.prototype.texParameteri;
+    const origTexParameterf = WebGL2RenderingContext.prototype.texParameterf;
+
+    WebGL2RenderingContext.prototype.bindTexture = function (target, texture) {
+      this._boundTextures = this._boundTextures || new Map();
+      this._boundTextures.set(target, texture);
+      return origBindTexture.call(this, target, texture);
+    };
+
+    WebGL2RenderingContext.prototype.texParameteri = function (target, pname, param) {
+      if (this._boundTextures && !this._boundTextures.get(target)) return;
+      return origTexParameteri.call(this, target, pname, param);
+    };
+
+    WebGL2RenderingContext.prototype.texParameterf = function (target, pname, param) {
+      if (this._boundTextures && !this._boundTextures.get(target)) return;
+      return origTexParameterf.call(this, target, pname, param);
+    };
+  }
+} catch (e) {}
+
 // require-trusted-types-for 'script' rejects a plain string on script.src,
 // new Worker(...) and importScripts(). A policy named "default" is applied to
 // every sink automatically, so no call site — ours or the engine's — has to
 // know about it.
-//
-// It asserts nothing about the URL, which is the honest position: CSP already
-// restricts scripts to 'self', and that is the check that actually holds.
 if (typeof trustedTypes !== "undefined") {
   try {
     trustedTypes.createPolicy("default", {
