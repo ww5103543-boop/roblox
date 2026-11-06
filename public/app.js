@@ -84,6 +84,48 @@
         window.__precompiledWasm = null;
       }
     }
+
+    // Preload UI asset bundle (241 VFS icons, textures, fonts) into memory ahead of launch
+    if (!window.__preloadedUiBundlePromise) {
+      window.__preloadedUiBundlePromise = fetch("/api/engine/ui-bundle")
+        .then((r) => (r.ok ? r.json() : null))
+        .then((bundle) => {
+          if (!bundle) return null;
+          const d = (window.__prefetchedAssets = window.__prefetchedAssets || new Map());
+          globalThis.__rbxAssetCache = globalThis.__rbxAssetCache || new Map();
+          const engineOrigin = location.origin + "/engine";
+          for (const [bPath, b64] of Object.entries(bundle)) {
+            const bin = atob(b64);
+            const arr = new Uint8Array(bin.length);
+            for (let bi = 0; bi < bin.length; bi++) arr[bi] = bin.charCodeAt(bi);
+            d.set(bPath, arr.buffer);
+            globalThis.__rbxAssetCache.set(bPath, arr.buffer);
+            if (bPath.startsWith("/content/")) {
+              const s1 = bPath.slice(8);
+              const s2 = bPath.slice(9);
+              globalThis.__rbxAssetCache.set(s1, arr.buffer);
+              globalThis.__rbxAssetCache.set(s2, arr.buffer);
+              globalThis.__rbxAssetCache.set("rbxasset://" + s2, arr.buffer);
+              globalThis.__rbxAssetCache.set(`${engineOrigin}${bPath}`, arr.buffer);
+              globalThis.__rbxAssetCache.set(`${engineOrigin}${s1}`, arr.buffer);
+            }
+          }
+          return bundle;
+        })
+        .catch(() => null);
+    }
+
+    // Warm browser HTTP cache for supporting engine worker and audio scripts
+    ["/engine/WasmPlayer.js", "/engine/audio-processor-fast.js", "/stub.js"].forEach((url) => {
+      fetch(url, { priority: "low" }).catch(() => {});
+    });
+  }
+
+  // Preload early on page idle so everything is compiled and ready before game join
+  if (typeof requestIdleCallback === "function") {
+    requestIdleCallback(() => startEnginePreload());
+  } else {
+    setTimeout(startEnginePreload, 150);
   }
 
   // -------------------------------------------------------------------------
@@ -355,6 +397,13 @@
     tile.appendChild(title);
     tile.appendChild(stats);
 
+    tile.addEventListener("mouseenter", () => {
+      startEnginePreload();
+      if (game.thumb) {
+        const preImg = new Image();
+        preImg.src = game.thumb;
+      }
+    }, { once: true, passive: true });
     tile.addEventListener("click", () => openExperienceDetail(game));
     return tile;
   }
@@ -400,6 +449,13 @@
 
     card.appendChild(banner);
     card.appendChild(foot);
+    card.addEventListener("mouseenter", () => {
+      startEnginePreload();
+      if (game.banner || game.thumb) {
+        const preImg = new Image();
+        preImg.src = game.banner || game.thumb;
+      }
+    }, { once: true, passive: true });
     card.addEventListener("click", () => openExperienceDetail(game));
     return card;
   }
