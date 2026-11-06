@@ -4,6 +4,11 @@
 // Suppress internal Roblox engine startup spam, benign settings warnings, and routine logs
 (function () {
   try {
+    try {
+      if (typeof window !== 'undefined') {
+        Object.defineProperty(window, 'WebTransport', { value: undefined, configurable: true, writable: true });
+      }
+    } catch (e) {}
     const _pats = [
       "[DIRECT KEY]",
       "[Direct Mouse",
