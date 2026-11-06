@@ -143,10 +143,6 @@
         if (typeof a === "string") {
           const s = a.trim();
           if (!s) return true;
-      if (s.includes("ugcGameLuaWillStart") || s.includes("joinGameSucceeded") || s.includes("defaultLoadingScreenRemoved")) {
-        try { window.dispatchEvent(new CustomEvent("rbx:game-started")); } catch (e) {}
-      }
-
           if (s === "created" || s.endsWith("created")) return true;
           if (s.startsWith("[DIRECT KEY]") || s.includes("[DIRECT KEY]") || s.includes("DIRECT KEY")) return true;
           if (s.startsWith("[Direct Mouse") || s.includes("Direct Mouse")) return true;
