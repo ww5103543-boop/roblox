@@ -608,6 +608,23 @@ class InsomniacHandler(BaseHTTPRequestHandler):
             file = file / "index.html"
 
         if not file.is_file():
+            if rel.startswith("engine/"):
+                cdn_sub = rel[len("engine/"):]
+                cdn_url = f"https://setup.rbxcdn.com/webclient/version-75f1039cb4964863-RobloxWebClient/{cdn_sub}"
+                try:
+                    c_req = urllib.request.Request(cdn_url, headers={"User-Agent": "Roblox/WinInet"})
+                    with urllib.request.urlopen(c_req, context=_SSL_CTX, timeout=8.0) as c_resp:
+                        if c_resp.status == 200:
+                            data = c_resp.read()
+                            try:
+                                file.parent.mkdir(parents=True, exist_ok=True)
+                                file.write_bytes(data)
+                            except Exception:
+                                pass
+                            self._respond(200, content_type(file), data, True, is_new_sid=is_new, sid=sess.sid)
+                            return
+                except Exception:
+                    pass
             self._respond(404, "text/plain", b"not found", False)
             return
 
