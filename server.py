@@ -71,6 +71,7 @@ MIME_MAP = {
     ".html": "text/html; charset=utf-8",
     ".css": "text/css",
     ".webmanifest": "application/manifest+json",
+    ".ico": "image/x-icon",
     ".png": "image/png",
     ".jpg": "image/jpeg",
     ".jpeg": "image/jpeg",

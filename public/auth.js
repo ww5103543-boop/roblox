@@ -121,8 +121,8 @@
         <div style="width:100%;max-width:390px;margin:auto;box-sizing:border-box;background:rgba(24,26,36,0.95);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.14);border-radius:16px;padding:32px 28px;box-shadow:0 24px 64px rgba(0,0,0,0.85);color:#ffffff;display:flex;flex-direction:column;align-items:center;text-align:center;">
           <!-- Branding -->
           <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:22px;color:#ffffff;">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-              <path fill-rule="evenodd" d="M18.92 2.01L5.08 6.84 2.01 20.69 15.85 15.86 18.92 2.01zM13.44 13.44l-4.14 1.45-1.45-4.14 4.14-1.45 1.45 4.14z"/>
+            <svg width="28" height="28" viewBox="0 0 56 56" fill="currentColor">
+              <path fill-rule="evenodd" d="M11.676 0 0 44.166 43.577 56l11.676-44.166zm20.409 35.827-12.177-3.308 3.264-12.342 12.182 3.308z"/>
             </svg>
             <span style="font-size:24px;font-weight:800;letter-spacing:0.3px;">Roblox</span>
           </div>
