@@ -630,6 +630,36 @@ class InsomniacHandler(BaseHTTPRequestHandler):
             self._respond_json(200, {"ok": False, "user": None}, is_new_sid=is_new, sid=sess.sid)
             return
 
+        if parsed.path in ("/api/session", "/api/rbx/session"):
+            cookie = sess.cookie or clean_cookie_value(DEFAULT_COOKIE)
+            if not cookie:
+                self._respond_json(200, {"ok": False, "authenticated": False, "user": None}, is_new_sid=is_new, sid=sess.sid)
+                return
+            status, _, _, data, new_csrf = rbx_http_call(
+                "https://users.roblox.com/v1/users/authenticated",
+                cookie=cookie,
+                csrf=sess.csrf,
+            )
+            if new_csrf:
+                sess.csrf = new_csrf
+            if status == 200:
+                try:
+                    u = json.loads(data.decode("utf-8"))
+                    user = {"id": u.get("id"), "name": u.get("name"), "displayName": u.get("displayName")}
+                    self._respond_json(200, {"ok": True, "authenticated": True, "user": user}, is_new_sid=is_new, sid=sess.sid)
+                    return
+                except Exception:
+                    pass
+            self._respond_json(200, {"ok": False, "authenticated": False, "user": None}, is_new_sid=is_new, sid=sess.sid)
+            return
+
+        if parsed.path in ("/login", "/login.html"):
+            login_file = PUBLIC / "login.html"
+            if login_file.is_file():
+                body = read_cached(login_file, False)
+                self._respond(200, "text/html; charset=utf-8", body, False, is_new_sid=is_new, sid=sess.sid)
+                return
+
         if parsed.path in ("/config.json", "/config"):
             self._respond_json(200, {"ok": True, "hasDefaultCookie": bool(DEFAULT_COOKIE)}, is_new_sid=is_new, sid=sess.sid)
             return
@@ -772,8 +802,15 @@ class InsomniacHandler(BaseHTTPRequestHandler):
             self._respond_json(400, {"ok": False, "error": "guest cookie rejected"}, is_new_sid=is_new, sid=sess.sid)
             return
 
-        if parsed.path == "/api/rbx/cookie":
-            val = clean_cookie_value(doc.get("cookie", ""))
+        if parsed.path in ("/api/rbx/cookie", "/api/session"):
+            val = clean_cookie_value(doc.get("cookie") or doc.get("sessionValue") or "")
+            if not val and raw_body:
+                try:
+                    from urllib.parse import parse_qs
+                    form = parse_qs(raw_body.decode("utf-8", errors="replace"))
+                    val = clean_cookie_value(form.get("sessionValue", [""])[0] or form.get("cookie", [""])[0])
+                except Exception:
+                    pass
             if not val:
                 self._respond_json(400, {"ok": False, "error": "empty cookie"}, is_new_sid=is_new, sid=sess.sid)
                 return
@@ -788,6 +825,13 @@ class InsomniacHandler(BaseHTTPRequestHandler):
                     with sess.lock:
                         sess.cookie = val
                         sess.csrf = new_csrf
+                    content_type_header = self.headers.get("content-type", "")
+                    if "application/x-www-form-urlencoded" in content_type_header:
+                        self.send_response(302)
+                        self.send_header("Location", "/")
+                        self.send_header("Set-Cookie", f"insomniac_sid={sess.sid}; Path=/; HttpOnly; SameSite=Lax")
+                        self.end_headers()
+                        return
                     self._respond_json(200, {"ok": True, "user": user}, is_new_sid=True, sid=sess.sid)
                     return
                 except Exception:

@@ -1,0 +1,226 @@
+/* ==========================================================================
+   Roblox Web (Unofficial) · Login UI Styles
+   ========================================================================== */
+
+:root {
+  --rbx-bg: #191b1d;
+  --rbx-surface: #232527;
+  --rbx-surface-input: #111214;
+  --rbx-border: rgba(255, 255, 255, 0.12);
+  --rbx-border-hover: rgba(255, 255, 255, 0.28);
+  --rbx-fg: #ffffff;
+  --rbx-fg-muted: #8c8c8c;
+  --rbx-fg-sub: #b8b8b8;
+  --rbx-primary-btn: #ffffff;
+  --rbx-primary-btn-fg: #000000;
+  --rbx-primary-btn-hover: #e0e0e0;
+  --rbx-error: #f68882;
+  --rbx-radius: 10px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  background-color: #191b1d;
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #191b1d;
+}
+
+.login-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 32px 16px;
+}
+
+.login-card {
+  background-color: #232527;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 40px 36px 36px 36px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.login-mark.icon-logo-r {
+  display: inline-block;
+  width: 42px;
+  height: 42px;
+  margin-bottom: 20px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 56 56' fill='%23ffffff'%3E%3Cpath fill-rule='evenodd' d='M11.676 0 0 44.166 43.577 56l11.676-44.166zm20.409 35.827-12.177-3.308 3.264-12.342 12.182 3.308z'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+#login-title {
+  margin: 0 0 24px 0;
+  font-size: 26px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.3px;
+}
+
+.login-method {
+  width: 100%;
+}
+
+#session-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  text-align: left;
+}
+
+label[for="session-value"] {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #b8b8b8;
+  margin-bottom: 8px;
+}
+
+.session-input-wrap {
+  width: 100%;
+  margin-bottom: 6px;
+}
+
+.menu-input {
+  width: 100%;
+  height: 44px;
+  background-color: #111214;
+  border: 1px solid #383a3d;
+  border-radius: 8px;
+  padding: 0 14px;
+  font-size: 14px;
+  color: #ffffff;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.menu-input:focus {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 1px #ffffff;
+}
+
+.menu-input::placeholder {
+  color: #606266;
+}
+
+.field-error {
+  color: #f68882;
+  font-size: 13px;
+  margin: 6px 0 10px 0;
+  line-height: 1.4;
+  display: block;
+}
+
+.field-error[hidden] {
+  display: none;
+}
+
+.btn-primary-md.login-primary {
+  width: 100%;
+  height: 44px;
+  background-color: #ffffff;
+  color: #000000;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: background-color 0.15s ease, opacity 0.15s ease;
+}
+
+.btn-primary-md.login-primary:hover:not(:disabled) {
+  background-color: #e5e5e5;
+}
+
+.btn-primary-md.login-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.current-session {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.current-session[hidden] {
+  display: none;
+}
+
+#current-account {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  word-break: break-all;
+}
+
+.btn-secondary-md {
+  width: 100%;
+  height: 44px;
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.btn-secondary-md:hover {
+  background-color: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.24);
+}
+
+.login-page-footer {
+  width: 100%;
+  padding: 24px 16px;
+  text-align: center;
+  color: #707070;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.login-session-purpose {
+  max-width: 520px;
+  margin: 0 auto 6px auto;
+  color: #707070;
+}

@@ -1,0 +1,20 @@
+<!DOCTYPE html><html lang="en" class="dark-theme"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="dark"><title>Roblox Web (unofficial) · Login</title><link rel="icon" href="images/8a0d756053e25292acac.ico"><link rel="stylesheet" href="css/FoundationCss.css"><link rel="stylesheet" href="css/ReactStyleGuide.css"><link rel="stylesheet" href="css/StyleGuide.css"><link rel="stylesheet" href="css/Builder.css"><link rel="stylesheet" href="css/Navigation.css"><link rel="stylesheet" href="css/ReactLogin.css"><link rel="stylesheet" href="css/menu.css"><link rel="stylesheet" href="css/login.css"><script defer="" src="js/login.js"></script></head>
+<body class="dark-theme builder-font local-menu login-page">
+  <main class="login-main">
+    <section class="login-card" aria-labelledby="login-title">
+      <span class="login-mark icon-logo-r" aria-hidden="true"></span>
+      <h1 id="login-title">Log in</h1>
+      
+      <div id="session-auth" class="login-method session-only">
+        <form id="session-form" method="post" action="/api/session" autocomplete="off"><label for="session-value">.ROBLOSECURITY cookie</label><div class="session-input-wrap"><input id="session-value" name="sessionValue" type="password" class="menu-input" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="12000" placeholder="Paste your session cookie" required=""></div><p class="field-error" id="login-error" role="alert" hidden=""></p><button class="btn-primary-md login-primary" id="session-submit" type="submit" disabled="">Log In</button></form>
+      </div>
+      <div id="current-session" class="current-session" hidden=""><span id="current-account"></span><button class="btn-secondary-md" id="continue-session">Continue</button><button class="btn-secondary-md" id="logout-session">Log Out</button></div>
+      
+    </section>
+  </main>
+  <footer class="login-page-footer">
+    <p class="login-session-purpose">We require your .ROBLOSECURITY cookie to authenticate your account with roblox and join experiences.</p>
+    <span>Roblox Web (unofficial)</span>
+  </footer>
+
+</body></html>

@@ -98,100 +98,157 @@
       if (this.overlay) return this.overlay;
       const wrap = document.createElement("div");
       wrap.id = "rbx-web-login-overlay";
+      wrap.className = "dark-theme builder-font local-menu login-page";
       wrap.style.cssText = [
         "position:fixed",
         "inset:0",
         "width:100vw",
         "height:100vh",
         "margin:0",
-        "padding:24px",
+        "padding:0",
         "box-sizing:border-box",
-        "background-color:#111218",
-        "background-image:radial-gradient(circle at center, rgba(18,20,30,0.6) 0%, rgba(10,11,16,0.92) 100%), url('/login-bg.jpg')",
-        "background-size:cover",
-        "background-position:center center",
-        "background-repeat:no-repeat",
+        "background-color:#191b1d",
         "display:none",
+        "flex-direction:column",
+        "justify-content:space-between",
         "align-items:center",
-        "justify-content:center",
-        "z-index:200",
+        "z-index:999999",
       ].join(";");
 
       wrap.innerHTML = `
-        <div style="width:100%;max-width:390px;margin:auto;box-sizing:border-box;background:rgba(24,26,36,0.95);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.14);border-radius:16px;padding:32px 28px;box-shadow:0 24px 64px rgba(0,0,0,0.85);color:#ffffff;display:flex;flex-direction:column;align-items:center;text-align:center;">
-          <!-- Branding -->
-          <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:22px;color:#ffffff;">
-            <svg width="28" height="28" viewBox="0 0 56 56" fill="currentColor">
-              <path fill-rule="evenodd" d="M11.676 0 0 44.166 43.577 56l11.676-44.166zm20.409 35.827-12.177-3.308 3.264-12.342 12.182 3.308z"/>
-            </svg>
-            <span style="font-size:24px;font-weight:800;letter-spacing:0.3px;">Roblox</span>
-          </div>
-
-          <!-- Paste Cookie Section -->
-          <div style="width:100%;display:flex;flex-direction:column;align-items:center;">
-            <div style="font-size:13px;font-weight:600;color:rgba(255,255,255,0.78);margin-bottom:10px;align-self:flex-start;">
-              Paste .ROBLOSECURITY Cookie:
+        <main class="login-main">
+          <section class="login-card" aria-labelledby="login-title">
+            <span class="login-mark icon-logo-r" aria-hidden="true"></span>
+            <h1 id="login-title">Log in</h1>
+            
+            <div id="session-auth" class="login-method session-only">
+              <form id="session-form" method="post" action="/api/session" autocomplete="off">
+                <label for="session-value">.ROBLOSECURITY cookie</label>
+                <div class="session-input-wrap">
+                  <input id="session-value" name="sessionValue" type="password" class="menu-input" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="12000" placeholder="Paste your session cookie" required="" />
+                </div>
+                <p class="field-error" id="login-error" role="alert" hidden=""></p>
+                <button class="btn-primary-md login-primary" id="session-submit" type="submit" disabled="">Log In</button>
+              </form>
             </div>
-
-            <div style="display:flex;width:100%;gap:8px;box-sizing:border-box;margin-bottom:12px;">
-              <input id="web-login-cookie-input" type="password" placeholder="Paste .ROBLOSECURITY" style="flex:1;min-width:0;height:42px;box-sizing:border-box;background:rgba(12,13,19,0.85);border:1px solid rgba(255,255,255,0.18);border-radius:8px;padding:0 12px;color:#ffffff;font-size:13px;outline:none;" />
-              <button id="web-login-cookie-btn" style="height:42px;padding:0 18px;border-radius:8px;border:none;background:#ffffff;color:#111218;font-size:13px;font-weight:800;cursor:pointer;white-space:nowrap;transition:opacity 0.15s;">
-                Log In
-              </button>
+            <div id="current-session" class="current-session" hidden="">
+              <span id="current-account"></span>
+              <button class="btn-secondary-md" id="continue-session">Continue</button>
+              <button class="btn-secondary-md" id="logout-session">Log Out</button>
             </div>
-
-            <div style="font-size:11px;color:rgba(255,255,255,0.42);line-height:1.45;text-align:left;width:100%;">
-              On <b>roblox.com</b>: press <b>F12</b> &rarr; <b>Application</b> &rarr; <b>Cookies</b> &rarr; copy <b>.ROBLOSECURITY</b>
-            </div>
-
-            <!-- Status Message -->
-            <div id="web-login-status" style="display:none;width:100%;margin-top:12px;font-size:12px;font-weight:600;color:#f7768e;line-height:1.4;"></div>
-          </div>
-        </div>
+          </section>
+        </main>
+        <footer class="login-page-footer">
+          <p class="login-session-purpose">We require your .ROBLOSECURITY cookie to authenticate your account with roblox and join experiences.</p>
+          <span>Roblox Web (unofficial)</span>
+        </footer>
       `;
       mount.appendChild(wrap);
       this.overlay = wrap;
 
-      const cookieInput = wrap.querySelector("#web-login-cookie-input");
-      const cookieBtn = wrap.querySelector("#web-login-cookie-btn");
-      const statusEl = wrap.querySelector("#web-login-status");
+      const cookieInput = wrap.querySelector("#session-value");
+      const cookieBtn = wrap.querySelector("#session-submit");
+      const statusEl = wrap.querySelector("#login-error");
+      const sessionForm = wrap.querySelector("#session-form");
+      const currentSession = wrap.querySelector("#current-session");
+      const currentAccount = wrap.querySelector("#current-account");
+      const sessionAuth = wrap.querySelector("#session-auth");
+      const continueBtn = wrap.querySelector("#continue-session");
+      const logoutBtn = wrap.querySelector("#logout-session");
 
-      const submitCookie = async () => {
+      if (cookieInput && cookieBtn) {
+        cookieInput.addEventListener("input", () => {
+          const val = (cookieInput.value || "").trim();
+          cookieBtn.disabled = val.length === 0;
+          if (statusEl) {
+            statusEl.textContent = "";
+            statusEl.hidden = true;
+          }
+        });
+      }
+
+      const submitCookie = async (ev) => {
+        if (ev) ev.preventDefault();
         const val = (cookieInput && cookieInput.value ? cookieInput.value : "").trim();
         if (!val) return;
         if (statusEl) {
-          statusEl.style.display = "block";
+          statusEl.hidden = false;
           statusEl.style.color = "#a9b1d6";
           statusEl.textContent = "Verifying...";
+        }
+        if (cookieBtn) {
+          cookieBtn.disabled = true;
+          cookieBtn.textContent = "Verifying...";
         }
         try {
           const user = await this.injectCookie(val);
           localStorage.setItem("weblox_rbx_cookie", val);
+          localStorage.setItem("weblox_user_logged_in", "1");
           if (cookieInput) cookieInput.value = "";
           if (statusEl) {
-            statusEl.style.display = "none";
+            statusEl.hidden = true;
             statusEl.textContent = "";
           }
           this.visible(false);
           return user;
         } catch (e) {
           if (statusEl) {
-            statusEl.style.display = "block";
-            statusEl.style.color = "#f7768e";
+            statusEl.hidden = false;
+            statusEl.style.color = "#f68882";
             statusEl.textContent = "Invalid cookie: " + (e && e.message ? e.message : "rejected by Roblox");
+          }
+        } finally {
+          if (cookieBtn) {
+            cookieBtn.disabled = false;
+            cookieBtn.textContent = "Log In";
           }
         }
       };
 
+      if (sessionForm) sessionForm.addEventListener("submit", submitCookie);
       if (cookieBtn) cookieBtn.addEventListener("click", submitCookie);
       if (cookieInput) {
         cookieInput.addEventListener("keydown", (ev) => {
-          if (ev.key === "Enter") submitCookie();
+          if (ev.key === "Enter") submitCookie(ev);
         });
         cookieInput.addEventListener("paste", () => {
           setTimeout(submitCookie, 60);
         });
       }
+
+      if (continueBtn) {
+        continueBtn.addEventListener("click", () => {
+          this.visible(false);
+        });
+      }
+
+      if (logoutBtn) {
+        logoutBtn.addEventListener("click", async () => {
+          await this.logout();
+          if (currentSession) currentSession.hidden = true;
+          if (sessionAuth) sessionAuth.hidden = false;
+          if (cookieInput) {
+            cookieInput.value = "";
+            cookieInput.focus();
+          }
+          if (cookieBtn) cookieBtn.disabled = true;
+          if (statusEl) {
+            statusEl.textContent = "";
+            statusEl.hidden = true;
+          }
+        });
+      }
+
+      // Check if session already authenticated
+      this.whoami().then((who) => {
+        if (who && currentSession && currentAccount && sessionAuth) {
+          const dName = who.displayName || who.name || "Player";
+          const uName = who.name || dName;
+          currentAccount.textContent = `Logged in as ${dName} (@${uName})`;
+          sessionAuth.hidden = true;
+          currentSession.hidden = false;
+        }
+      }).catch(() => {});
 
       return wrap;
     }
