@@ -254,8 +254,6 @@
   const viewCollection = document.getElementById("view-collection");
   const viewSearch = document.getElementById("view-search");
   const viewDetail = document.getElementById("view-game-detail");
-  const viewProfile = document.getElementById("view-profile");
-
   const topUser = document.getElementById("rbx-top-user");
   const topAvatar = document.getElementById("rbx-top-avatar");
   const topUsername = document.getElementById("rbx-top-username");
@@ -263,37 +261,6 @@
   const sideAvatar = document.getElementById("rbx-side-avatar");
   const sideUsername = document.getElementById("rbx-side-username");
   const sideFriendCount = document.getElementById("rbx-side-friend-count");
-
-  // Official Roblox Profile View DOM Elements
-  const profileAvatarFrame = document.getElementById("profile-avatar-frame");
-  const profileAvatarImg = document.getElementById("profile-avatar-img");
-  const profilePresenceIndicator = document.getElementById("profile-presence-indicator");
-  const profileAvatarViewToggle = document.getElementById("profile-avatar-view-toggle");
-  const profileAvatarToggleLabel = document.getElementById("profile-avatar-toggle-label");
-  const profileDisplayName = document.getElementById("profile-display-name");
-  const profileVerifiedBadge = document.getElementById("profile-verified-badge");
-  const profileUsername = document.getElementById("profile-username");
-  const profileJoinDate = document.getElementById("profile-join-date");
-  const profilePresenceText = document.getElementById("profile-presence-text");
-  const profileStatFriends = document.getElementById("profile-stat-friends");
-  const profileStatFollowers = document.getElementById("profile-stat-followers");
-  const profileStatFollowing = document.getElementById("profile-stat-following");
-  const profileStatFriendsBtn = document.getElementById("profile-stat-friends-btn");
-  const profileActionPrimary = document.getElementById("profile-action-primary");
-  const profileActionShare = document.getElementById("profile-action-share");
-  const profileTabBtnAbout = document.getElementById("profile-tab-btn-about");
-  const profileTabBtnCreations = document.getElementById("profile-tab-btn-creations");
-  const profileTabAbout = document.getElementById("profile-tab-about");
-  const profileTabCreations = document.getElementById("profile-tab-creations");
-  const profileAboutText = document.getElementById("profile-about-text");
-  const profileWearingGrid = document.getElementById("profile-wearing-grid");
-  const profileWearingCount = document.getElementById("profile-wearing-count");
-  const profileFriendsPreviewGrid = document.getElementById("profile-friends-preview-grid");
-  const profileFriendsPreviewTitle = document.getElementById("profile-friends-preview-title");
-  const profileSeeAllFriends = document.getElementById("profile-see-all-friends");
-  const profileBadgesGrid = document.getElementById("profile-badges-grid");
-  const profileBadgesCount = document.getElementById("profile-badges-count");
-  const profileCreationsGrid = document.getElementById("profile-creations-grid");
 
   const loginSwitchBtn = document.getElementById("rbx-login-switch-btn");
   const signupSwitchBtn = document.getElementById("rbx-signup-switch-btn");
@@ -319,7 +286,6 @@
     if (viewCollection) viewCollection.style.display = name === "collection" ? "block" : "none";
     if (viewSearch) viewSearch.style.display = name === "search" ? "block" : "none";
     viewDetail.style.display = name === "detail" ? "block" : "none";
-    if (viewProfile) viewProfile.style.display = name === "profile" ? "block" : "none";
 
     document.querySelectorAll(".rbx-side-item").forEach((el) => {
       el.classList.toggle("active", el.dataset.side === name);
@@ -541,7 +507,7 @@
             name: stripEmojis(f.lastLocation || `Place ${f.placeId}`),
           });
         } else {
-          openProfileView(f.id);
+          showView("friends");
         }
       });
       strip.appendChild(tile);
@@ -622,12 +588,8 @@
       cInfo.appendChild(cHandle);
       cInfo.appendChild(cStat);
 
-      cAv.style.cursor = "pointer";
-      cInfo.style.cursor = "pointer";
-      cAv.title = "View Profile";
-      cInfo.title = "View Profile";
-      cAv.addEventListener("click", () => openProfileView(f.id));
-      cInfo.addEventListener("click", () => openProfileView(f.id));
+      cAv.title = displayName;
+      cInfo.title = displayName;
 
       card.appendChild(cAv);
       card.appendChild(cInfo);
@@ -767,453 +729,6 @@
   document.getElementById("detail-play-btn").addEventListener("click", () => {
     if (activeDetailGame) launchExperience(activeDetailGame);
   });
-
-  // -------------------------------------------------------------------------
-  // 5b. Authentic Roblox Profile View (Official Layout & Live APIs)
-  // -------------------------------------------------------------------------
-  let activeProfileUserId = null;
-  let activeProfileHeadshotUrl = "";
-  let activeProfileFullBodyUrl = "";
-  let activeProfileAvatarMode = "full"; // "full" (3D render) or "headshot" (2D circular)
-
-  function setProfileAvatarMode(mode) {
-    activeProfileAvatarMode = mode;
-    if (!profileAvatarFrame || !profileAvatarImg) return;
-    if (mode === "headshot") {
-      profileAvatarFrame.classList.remove("mode-full");
-      profileAvatarFrame.classList.add("mode-headshot");
-      profileAvatarImg.src = activeProfileHeadshotUrl || currentMyAvatar;
-      if (profileAvatarToggleLabel) profileAvatarToggleLabel.textContent = "3D View";
-    } else {
-      profileAvatarFrame.classList.remove("mode-headshot");
-      profileAvatarFrame.classList.add("mode-full");
-      profileAvatarImg.src = activeProfileFullBodyUrl || activeProfileHeadshotUrl || currentMyAvatar;
-      if (profileAvatarToggleLabel) profileAvatarToggleLabel.textContent = "Headshot";
-    }
-  }
-
-  function switchProfileTab(tabName) {
-    if (profileTabBtnAbout) profileTabBtnAbout.classList.toggle("active", tabName === "about");
-    if (profileTabBtnCreations) profileTabBtnCreations.classList.toggle("active", tabName === "creations");
-    if (profileTabAbout) profileTabAbout.style.display = tabName === "about" ? "block" : "none";
-    if (profileTabCreations) profileTabCreations.style.display = tabName === "creations" ? "block" : "none";
-  }
-
-  function formatJoinDate(iso) {
-    if (!iso) return "Joined —";
-    try {
-      const d = new Date(iso);
-      if (isNaN(d.getTime())) return "Joined —";
-      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-      return `Joined ${monthNames[d.getMonth()]} ${d.getFullYear()}`;
-    } catch (e) {
-      return "Joined —";
-    }
-  }
-
-  function formatAssetTypeName(rawCategory) {
-    if (!rawCategory) return "Item";
-    return String(rawCategory)
-      .replace(/([a-z])([A-Z])/g, "$1 $2")
-      .replace(/_/g, " ")
-      .trim();
-  }
-
-  async function rbxFetchJson(url, options = {}) {
-    const auth = window.auth;
-    if (options.method === "POST" || options.body) {
-      if (auth && typeof auth.postJson === "function") {
-        try {
-          const res = await auth.postJson(url, options.body);
-          if (res) return res;
-        } catch (e) {}
-      }
-      try {
-        const res = await fetch(url, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(options.body || {}),
-        });
-        if (res.ok) return await res.json();
-      } catch (e) {}
-      return null;
-    }
-
-    if (auth && typeof auth.fetchJson === "function") {
-      try {
-        const res = await auth.fetchJson(url);
-        if (res) return res;
-      } catch (e) {}
-    }
-    try {
-      const res = await fetch(url);
-      if (res.ok) return await res.json();
-    } catch (e) {}
-    return null;
-  }
-
-  async function openProfileView(targetUserId) {
-    let who = window.__whoami;
-    if (!who && window.auth && typeof window.auth.whoami === "function") {
-      who = await window.auth.whoami().catch(() => null);
-      if (who) window.__whoami = who;
-    }
-
-    const isSelf = !targetUserId || (who && String(who.id) === String(targetUserId));
-    const uid = isSelf ? (who ? who.id : null) : targetUserId;
-
-    if (!uid) return;
-    activeProfileUserId = uid;
-
-    // 1. Immediate UI state transition (0ms latency feel)
-    showView("profile");
-    switchProfileTab("about");
-
-    const fallbackName = isSelf ? ((who && who.displayName) || (who && who.name) || "Player") : `User ${uid}`;
-    const fallbackHandle = isSelf ? ((who && who.name) || "Player") : `User${uid}`;
-
-    if (profileDisplayName) profileDisplayName.textContent = fallbackName;
-    if (profileUsername) profileUsername.textContent = "@" + fallbackHandle;
-    if (profileVerifiedBadge) profileVerifiedBadge.style.display = "none";
-    if (profileJoinDate) profileJoinDate.textContent = "Joined —";
-    if (profileAboutText) profileAboutText.textContent = "Loading profile...";
-    if (profileStatFriends) profileStatFriends.textContent = "—";
-    if (profileStatFollowers) profileStatFollowers.textContent = "—";
-    if (profileStatFollowing) profileStatFollowing.textContent = "—";
-
-    if (profilePresenceText) {
-      profilePresenceText.innerHTML = `<span class="rbx-presence-pill online">● Online</span>`;
-    }
-    if (profilePresenceIndicator) {
-      profilePresenceIndicator.className = "rbx-profile-presence-dot rbx-presence-online";
-    }
-
-    if (profileActionPrimary) {
-      const span = profileActionPrimary.querySelector("span");
-      if (span) span.textContent = isSelf ? "Customize Avatar" : "Add Friend";
-    }
-
-    activeProfileHeadshotUrl = isSelf && currentMyAvatar ? currentMyAvatar : makeAvatarPlaceholder(fallbackName);
-    activeProfileFullBodyUrl = activeProfileHeadshotUrl;
-    setProfileAvatarMode("full");
-
-    if (profileWearingGrid) {
-      profileWearingGrid.innerHTML = `<div class="rbx-wearing-empty" style="color:var(--tn-fg-muted);font-size:13px;padding:8px 0">Loading avatar items...</div>`;
-    }
-    if (profileWearingCount) profileWearingCount.textContent = "0 items";
-    if (profileFriendsPreviewGrid) {
-      profileFriendsPreviewGrid.innerHTML = `<div style="color:var(--tn-fg-muted);font-size:13px;padding:8px 0">Loading friends...</div>`;
-    }
-    if (profileBadgesGrid) {
-      profileBadgesGrid.innerHTML = `<div style="color:var(--tn-fg-muted);font-size:13px;padding:8px 0">Loading badges...</div>`;
-    }
-    if (profileBadgesCount) profileBadgesCount.textContent = "0 badges";
-    if (profileCreationsGrid) {
-      profileCreationsGrid.innerHTML = `<div style="color:var(--tn-fg-muted);font-size:13px;padding:8px 0">Loading experiences...</div>`;
-    }
-
-    // 2. Fetch live data across official Roblox endpoints in parallel
-    try {
-      const [uRes, hsRes, fbRes, frCountRes, foCountRes, fgCountRes, presRes, cwRes, badgesRes, gamesRes] =
-        await Promise.all([
-          rbxFetchJson(`https://users.roblox.com/v1/users/${uid}`),
-          rbxFetchJson(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${uid}&size=150x150&format=Png&isCircular=true`),
-          rbxFetchJson(`https://thumbnails.roblox.com/v1/users/avatar?userIds=${uid}&size=352x352&format=Png&isCircular=false`),
-          rbxFetchJson(`https://friends.roblox.com/v1/users/${uid}/friends/count`),
-          rbxFetchJson(`https://friends.roblox.com/v1/users/${uid}/followers/count`),
-          rbxFetchJson(`https://friends.roblox.com/v1/users/${uid}/followings/count`),
-          rbxFetchJson("https://presence.roblox.com/v1/presence/users", { method: "POST", body: { userIds: [uid] } }),
-          rbxFetchJson(`https://avatar.roblox.com/v1/users/${uid}/currently-wearing`),
-          rbxFetchJson(`https://accountinformation.roblox.com/v1/users/${uid}/roblox-badges`),
-          rbxFetchJson(`https://games.roblox.com/v2/users/${uid}/games?sortOrder=Asc&limit=20`),
-        ]);
-
-      if (String(activeProfileUserId) !== String(uid)) return;
-
-      // Identity & Bio
-      if (uRes) {
-        if (profileDisplayName) profileDisplayName.textContent = uRes.displayName || uRes.name || fallbackName;
-        if (profileUsername) profileUsername.textContent = "@" + (uRes.name || fallbackHandle);
-        if (profileVerifiedBadge) {
-          profileVerifiedBadge.style.display = uRes.hasVerifiedBadge ? "inline-flex" : "none";
-        }
-        if (profileJoinDate) {
-          profileJoinDate.textContent = formatJoinDate(uRes.created);
-        }
-        if (profileAboutText) {
-          profileAboutText.textContent = uRes.description && uRes.description.trim() ? uRes.description : "No bio available.";
-        }
-      }
-
-      // 3D Avatar Render and Headshot
-      const hs = hsRes && hsRes.data && hsRes.data[0] && hsRes.data[0].imageUrl;
-      const fb = fbRes && fbRes.data && fbRes.data[0] && fbRes.data[0].imageUrl;
-      if (hs) activeProfileHeadshotUrl = hs;
-      if (fb) activeProfileFullBodyUrl = fb;
-      setProfileAvatarMode(activeProfileAvatarMode);
-
-      // Presence
-      const pres = presRes && presRes.userPresences && presRes.userPresences[0];
-      const pType = pres ? pres.userPresenceType : (isSelf ? 1 : 0);
-      const loc = (pres && pres.lastLocation) || "";
-      if (profilePresenceText && profilePresenceIndicator) {
-        if (pType === 2) {
-          profilePresenceText.innerHTML = `<span class="rbx-presence-pill ingame">▶ In-Experience${loc ? ` (${stripEmojis(loc)})` : ""}</span>`;
-          profilePresenceIndicator.className = "rbx-profile-presence-dot rbx-presence-ingame";
-          profilePresenceIndicator.innerHTML = SVG_PLAY_MINI;
-        } else if (pType === 1) {
-          profilePresenceText.innerHTML = `<span class="rbx-presence-pill online">● Online</span>`;
-          profilePresenceIndicator.className = "rbx-profile-presence-dot rbx-presence-online";
-          profilePresenceIndicator.innerHTML = "";
-        } else {
-          profilePresenceText.innerHTML = `<span class="rbx-presence-pill offline">● Offline</span>`;
-          profilePresenceIndicator.className = "rbx-profile-presence-dot rbx-presence-offline";
-          profilePresenceIndicator.innerHTML = "";
-        }
-      }
-
-      // Social stats
-      const friendsCount = frCountRes && typeof frCountRes.count === "number" ? frCountRes.count : 0;
-      const followersCount = foCountRes && typeof foCountRes.count === "number" ? foCountRes.count : 0;
-      const followingCount = fgCountRes && typeof fgCountRes.count === "number" ? fgCountRes.count : 0;
-
-      if (profileStatFriends) profileStatFriends.textContent = formatCount(friendsCount);
-      if (profileStatFollowers) profileStatFollowers.textContent = formatCount(followersCount);
-      if (profileStatFollowing) profileStatFollowing.textContent = formatCount(followingCount);
-
-      // Friends Preview
-      if (profileFriendsPreviewTitle) {
-        profileFriendsPreviewTitle.textContent = `Friends (${friendsCount})`;
-      }
-      let previewFriends = [];
-      if (isSelf && userFriends && userFriends.length > 0) {
-        previewFriends = userFriends.slice(0, 8);
-      } else {
-        const frListRes = await rbxFetchJson(`https://friends.roblox.com/v1/users/${uid}/friends`);
-        const rawFriends = frListRes && Array.isArray(frListRes.data) ? frListRes.data.slice(0, 8) : [];
-        if (rawFriends.length) {
-          const friendIds = rawFriends.map((f) => f.id);
-          const fAvRes = await rbxFetchJson(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${friendIds.join(",")}&size=150x150&format=Png&isCircular=true`);
-          const fAvMap = {};
-          if (fAvRes && Array.isArray(fAvRes.data)) {
-            fAvRes.data.forEach((x) => { if (x.targetId && x.imageUrl) fAvMap[x.targetId] = x.imageUrl; });
-          }
-          previewFriends = rawFriends.map((f) => ({
-            id: f.id,
-            name: f.name,
-            displayName: f.displayName || f.name,
-            avatar: fAvMap[f.id] || makeAvatarPlaceholder(f.displayName || f.name),
-            presenceType: 0,
-          }));
-        }
-      }
-
-      if (profileFriendsPreviewGrid) {
-        profileFriendsPreviewGrid.innerHTML = "";
-        if (!previewFriends.length) {
-          profileFriendsPreviewGrid.innerHTML = `<div style="color:var(--tn-fg-muted);font-size:13px;padding:8px 0">No friends to show.</div>`;
-        } else {
-          for (const f of previewFriends) {
-            const tile = document.createElement("div");
-            tile.className = "rbx-profile-friend-mini";
-            tile.title = `${f.displayName} (@${f.name})`;
-
-            const av = document.createElement("div");
-            av.className = "rbx-profile-friend-mini-avatar";
-            const img = document.createElement("img");
-            img.src = f.avatar || makeAvatarPlaceholder(f.displayName);
-            img.alt = f.displayName;
-            av.appendChild(img);
-
-            const n = document.createElement("div");
-            n.className = "rbx-profile-friend-mini-name";
-            n.textContent = f.displayName || f.name;
-
-            tile.appendChild(av);
-            tile.appendChild(n);
-            tile.addEventListener("click", () => openProfileView(f.id));
-            profileFriendsPreviewGrid.appendChild(tile);
-          }
-        }
-      }
-
-      // Currently Wearing
-      const assetIds = (cwRes && Array.isArray(cwRes.assetIds)) ? cwRes.assetIds : [];
-      if (profileWearingCount) {
-        profileWearingCount.textContent = `${assetIds.length} item${assetIds.length === 1 ? "" : "s"}`;
-      }
-      if (profileWearingGrid) {
-        if (!assetIds.length) {
-          profileWearingGrid.innerHTML = `<div class="rbx-wearing-empty" style="color:var(--tn-fg-muted);font-size:13px;padding:8px 0">No items currently worn.</div>`;
-        } else {
-          profileWearingGrid.innerHTML = "";
-          const batchIds = assetIds.slice(0, 30);
-          const awRes = await rbxFetchJson(`https://thumbnails.roblox.com/v1/assets?assetIds=${batchIds.join(",")}&size=150x150&format=Png`);
-          const assetThumbMap = new Map();
-          if (awRes && Array.isArray(awRes.data)) {
-            awRes.data.forEach((item) => {
-              if (item.targetId && item.imageUrl) {
-                assetThumbMap.set(Number(item.targetId), item.imageUrl);
-              }
-            });
-          }
-
-          for (const aid of assetIds) {
-            const card = document.createElement("div");
-            card.className = "rbx-wearing-item-card";
-            card.title = `Asset ID: ${aid}`;
-
-            const img = document.createElement("img");
-            img.className = "rbx-wearing-item-thumb";
-            const imgUrl = assetThumbMap.get(Number(aid)) || "";
-            img.src = imgUrl || makeFallbackThumb("Asset", aid, false);
-            img.alt = `Asset ${aid}`;
-            img.loading = "lazy";
-
-            let cat = "Accessory";
-            if (imgUrl) {
-              const parts = imgUrl.split("/");
-              const idx150 = parts.indexOf("150");
-              if (idx150 !== -1 && parts[idx150 + 2]) {
-                cat = formatAssetTypeName(parts[idx150 + 2]);
-              }
-            }
-
-            const nameEl = document.createElement("div");
-            nameEl.className = "rbx-wearing-item-name";
-            nameEl.textContent = `Asset ${aid}`;
-
-            const typeEl = document.createElement("div");
-            typeEl.className = "rbx-wearing-item-type";
-            typeEl.textContent = cat;
-
-            card.appendChild(img);
-            card.appendChild(nameEl);
-            card.appendChild(typeEl);
-
-            card.addEventListener("click", () => {
-              window.open(`https://www.roblox.com/catalog/${aid}`, "_blank");
-            });
-
-            profileWearingGrid.appendChild(card);
-          }
-
-          // Progressively fetch real asset names in background without blocking
-          Promise.allSettled(
-            assetIds.slice(0, 12).map(async (aid) => {
-              const det = await rbxFetchJson(`https://economy.roblox.com/v2/assets/${aid}/details`);
-              if (det && det.Name) {
-                const cards = profileWearingGrid.querySelectorAll(".rbx-wearing-item-card");
-                cards.forEach((c) => {
-                  if (c.title === `Asset ID: ${aid}`) {
-                    const n = c.querySelector(".rbx-wearing-item-name");
-                    if (n) n.textContent = stripEmojis(det.Name);
-                  }
-                });
-              }
-            })
-          );
-        }
-      }
-
-      // Roblox Badges
-      const badges = Array.isArray(badgesRes) ? badgesRes : [];
-      if (profileBadgesCount) {
-        profileBadgesCount.textContent = `${badges.length} badge${badges.length === 1 ? "" : "s"}`;
-      }
-      if (profileBadgesGrid) {
-        profileBadgesGrid.innerHTML = "";
-        if (!badges.length) {
-          profileBadgesGrid.innerHTML = `<div style="color:var(--tn-fg-muted);font-size:13px;padding:8px 0">No badges earned yet.</div>`;
-        } else {
-          for (const b of badges) {
-            const card = document.createElement("div");
-            card.className = "rbx-badge-card";
-            card.title = `${b.name}: ${b.description || ""}`;
-
-            const img = document.createElement("img");
-            img.src = b.imageUrl || "";
-            img.alt = b.name;
-            img.loading = "lazy";
-
-            const name = document.createElement("div");
-            name.className = "rbx-badge-card-name";
-            name.textContent = b.name;
-
-            card.appendChild(img);
-            card.appendChild(name);
-            profileBadgesGrid.appendChild(card);
-          }
-        }
-      }
-
-      // Creations
-      const creations = (gamesRes && Array.isArray(gamesRes.data)) ? gamesRes.data : [];
-      if (profileCreationsGrid) {
-        profileCreationsGrid.innerHTML = "";
-        if (!creations.length) {
-          profileCreationsGrid.innerHTML = `<div style="color:var(--tn-fg-muted);font-size:13px;padding:8px 0">No public experiences.</div>`;
-        } else {
-          const uids = creations.map((g) => g.id).filter(Boolean);
-          let gThumbMap = {};
-          if (uids.length) {
-            const gtRes = await rbxFetchJson(`https://thumbnails.roblox.com/v1/games/icons?universeIds=${uids.join(",")}&returnPolicy=PlaceHolder&size=256x256&format=Png&isCircular=false`);
-            if (gtRes && Array.isArray(gtRes.data)) {
-              gtRes.data.forEach((x) => { if (x.targetId && x.imageUrl) gThumbMap[x.targetId] = x.imageUrl; });
-            }
-          }
-
-          for (const g of creations) {
-            const placeId = (g.rootPlace && g.rootPlace.id) || g.id;
-            const gameObj = {
-              placeId: String(placeId),
-              universeId: g.id,
-              name: stripEmojis(g.name || "Experience"),
-              creator: (g.creator && g.creator.name) || (profileDisplayName ? profileDisplayName.textContent : "Roblox"),
-              thumb: gThumbMap[g.id] || makeFallbackThumb(g.name, placeId, false),
-            };
-            registerGame(gameObj);
-
-            const card = document.createElement("div");
-            card.className = "rbx-creation-card";
-
-            const thumb = document.createElement("div");
-            thumb.className = "rbx-creation-thumb";
-            const img = document.createElement("img");
-            img.src = gameObj.thumb;
-            img.alt = gameObj.name;
-            thumb.appendChild(img);
-
-            const body = document.createElement("div");
-            body.className = "rbx-creation-body";
-
-            const title = document.createElement("div");
-            title.className = "rbx-creation-title";
-            title.textContent = gameObj.name;
-
-            const playBtn = document.createElement("button");
-            playBtn.className = "rbx-creation-play-btn";
-            playBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg><span>Play</span>`;
-            playBtn.addEventListener("click", (e) => {
-              e.stopPropagation();
-              launchExperience(gameObj);
-            });
-
-            body.appendChild(title);
-            body.appendChild(playBtn);
-
-            card.appendChild(thumb);
-            card.appendChild(body);
-            card.addEventListener("click", () => openExperienceDetail(gameObj));
-
-            profileCreationsGrid.appendChild(card);
-          }
-        }
-      }
-    } catch (e) {
-      console.warn("[app] profile load error:", e);
-    }
-  }
 
   // -------------------------------------------------------------------------
   // 6. Progressive Account Loader (Home Updates First, Charts Second)
@@ -1778,86 +1293,138 @@
         const s = btn.dataset.side;
         if (s === "home" || s === "friends" || s === "charts") {
           showView(s);
-        } else if (s === "profile") {
-          openProfileView();
         }
       });
     });
 
-    if (sideProfile) sideProfile.addEventListener("click", () => openProfileView());
-    if (topUser) topUser.addEventListener("click", () => openProfileView());
-
-    // Profile View Interactions
-    if (profileAvatarViewToggle) {
-      profileAvatarViewToggle.addEventListener("click", () => {
-        setProfileAvatarMode(activeProfileAvatarMode === "full" ? "headshot" : "full");
+    if (sideProfile) {
+      sideProfile.addEventListener("click", () => {
+        updateSettingsAccountInfo();
+        if (settingsOverlay) settingsOverlay.style.display = "flex";
       });
     }
-    if (profileTabBtnAbout) {
-      profileTabBtnAbout.addEventListener("click", () => switchProfileTab("about"));
-    }
-    if (profileTabBtnCreations) {
-      profileTabBtnCreations.addEventListener("click", () => switchProfileTab("creations"));
-    }
-    if (profileSeeAllFriends) {
-      profileSeeAllFriends.addEventListener("click", () => showView("friends"));
-    }
-    if (profileStatFriendsBtn) {
-      profileStatFriendsBtn.addEventListener("click", () => showView("friends"));
-    }
-    if (profileActionShare) {
-      profileActionShare.addEventListener("click", async () => {
-        const uid = activeProfileUserId || (window.__whoami && window.__whoami.id) || "";
-        const shareUrl = `https://www.roblox.com/users/${uid}/profile`;
-        try {
-          await navigator.clipboard.writeText(shareUrl);
-          const span = profileActionShare.querySelector("span");
-          if (span) {
-            const old = span.textContent;
-            span.textContent = "Copied!";
-            setTimeout(() => { span.textContent = old; }, 2000);
-          }
-        } catch (e) {
-          prompt("Copy profile link:", shareUrl);
-        }
-      });
-    }
-    if (profileActionPrimary) {
-      profileActionPrimary.addEventListener("click", () => {
-        const isSelf = !activeProfileUserId || (window.__whoami && String(window.__whoami.id) === String(activeProfileUserId));
-        if (isSelf) {
-          launchExperience({
-            placeId: "7041939546",
-            universeId: 2711375305,
-            name: "Catalog Avatar Creator",
-            creator: "ItsMunees",
-          });
-        }
+    if (topUser) {
+      topUser.addEventListener("click", () => {
+        updateSettingsAccountInfo();
+        if (settingsOverlay) settingsOverlay.style.display = "flex";
       });
     }
 
-    // Settings Menu & Theme Picker & Switch Account
-    settingsBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      settingsMenu.style.display = settingsMenu.style.display === "flex" ? "none" : "flex";
+    // Settings Menu & Modal Dialog
+    const settingsOverlay = document.getElementById("rbx-settings-overlay");
+    const settingsCloseBtn = document.getElementById("rbx-settings-close");
+    const settingsDoneBtn = document.getElementById("rbx-settings-done-btn");
+    const menuOpenSettings = document.getElementById("menu-open-settings");
+    const menuSwitchAccount = document.getElementById("menu-switch-account");
+    const menuLogoutBtn = document.getElementById("menu-logout-btn");
+    const settingPotatoTextures = document.getElementById("setting-potato-textures");
+    const settingFastSky = document.getElementById("setting-fast-sky");
+    const settingTargetFps = document.getElementById("setting-target-fps");
+    const settingsAccountLabel = document.getElementById("settings-account-label");
+
+    if (settingPotatoTextures) {
+      settingPotatoTextures.checked = localStorage.getItem("rbx_potato_textures") !== "false";
+      settingPotatoTextures.addEventListener("change", () => {
+        localStorage.setItem("rbx_potato_textures", settingPotatoTextures.checked ? "true" : "false");
+      });
+    }
+    if (settingFastSky) {
+      settingFastSky.checked = localStorage.getItem("rbx_fast_sky") !== "false";
+      settingFastSky.addEventListener("change", () => {
+        localStorage.setItem("rbx_fast_sky", settingFastSky.checked ? "true" : "false");
+      });
+    }
+    if (settingTargetFps) {
+      const savedFps = localStorage.getItem("rbx_target_fps") || "240";
+      settingTargetFps.value = savedFps;
+      settingTargetFps.addEventListener("change", () => {
+        localStorage.setItem("rbx_target_fps", settingTargetFps.value);
+      });
+    }
+
+    function updateSettingsAccountInfo() {
+      if (!settingsAccountLabel) return;
+      if (window.__whoami) {
+        const dName = window.__whoami.displayName || window.__whoami.name || "Player";
+        const uName = window.__whoami.name || dName;
+        settingsAccountLabel.textContent = `${dName} (@${uName}) • ID: ${window.__whoami.id}`;
+      } else {
+        settingsAccountLabel.textContent = "Not logged in";
+      }
+    }
+
+    if (settingsBtn) {
+      settingsBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        settingsMenu.style.display = settingsMenu.style.display === "flex" ? "none" : "flex";
+      });
+    }
+
+    if (settingsMenu) {
+      settingsMenu.addEventListener("click", (e) => {
+        e.stopPropagation();
+      });
+    }
+
+    document.addEventListener("click", () => {
+      if (settingsMenu) settingsMenu.style.display = "none";
     });
-    addEventListener("click", () => {
-      settingsMenu.style.display = "none";
-    });
+
+    if (menuOpenSettings) {
+      menuOpenSettings.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (settingsMenu) settingsMenu.style.display = "none";
+        updateSettingsAccountInfo();
+        if (settingsOverlay) settingsOverlay.style.display = "flex";
+      });
+    }
+
+    if (settingsCloseBtn) {
+      settingsCloseBtn.addEventListener("click", () => {
+        if (settingsOverlay) settingsOverlay.style.display = "none";
+      });
+    }
+
+    if (settingsDoneBtn) {
+      settingsDoneBtn.addEventListener("click", () => {
+        if (settingsOverlay) settingsOverlay.style.display = "none";
+      });
+    }
+
+    if (settingsOverlay) {
+      settingsOverlay.addEventListener("click", (e) => {
+        if (e.target === settingsOverlay) {
+          settingsOverlay.style.display = "none";
+        }
+      });
+    }
+
+    if (menuSwitchAccount) {
+      menuSwitchAccount.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        if (settingsMenu) settingsMenu.style.display = "none";
+        currentMyAvatar = "";
+        userFriends = [];
+        const who = await requireAuthSession(auth, true);
+        showView("home");
+        loadAccountExperiencesFromRoblox(auth, who);
+      });
+    }
+
+    if (menuLogoutBtn) {
+      menuLogoutBtn.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        if (settingsMenu) settingsMenu.style.display = "none";
+        await requireAuthSession(auth, true);
+      });
+    }
+
     document.querySelectorAll("[data-theme-pick]").forEach((btn) => {
       btn.addEventListener("click", (e) => {
         e.stopPropagation();
         applyTheme(btn.dataset.themePick);
-        settingsMenu.style.display = "none";
+        if (settingsMenu) settingsMenu.style.display = "none";
       });
-    });
-    document.getElementById("menu-switch-account").addEventListener("click", async () => {
-      settingsMenu.style.display = "none";
-      currentMyAvatar = "";
-      userFriends = [];
-      const who = await requireAuthSession(auth, true);
-      showView("home");
-      loadAccountExperiencesFromRoblox(auth, who);
     });
 
     // Friends page subtabs & live search
