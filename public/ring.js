@@ -111,10 +111,10 @@
 
       sock.onerror = (e) => {
         stats.errors++;
-        console.warn("[ring] WS connection error:", e);
+        console.warn(`[ring] WS connection error to ${wsUrl}:`, e);
         if (!settled) {
           settled = true;
-          reject(new Error("WebSocket UDP relay failed to connect"));
+          reject(new Error(`WebSocket UDP relay failed to connect (${host}:${port})`));
         }
       };
 
@@ -122,20 +122,21 @@
         if (ws === sock) {
           running = false;
           ws = null;
-          log(`WS-UDP socket closed (code=${ev.code})`);
+          log(`WS-UDP socket closed (code=${ev.code}, reason=${ev.reason || "none"})`);
         }
       };
     });
 
     let lastErr = null;
-    for (let attempt = 1; attempt <= 3; attempt++) {
+    for (let attempt = 1; attempt <= 5; attempt++) {
       try {
         await connectWs();
         lastErr = null;
         break;
       } catch (err) {
         lastErr = err;
-        if (attempt < 3) await new Promise((r) => setTimeout(r, 200 * attempt));
+        console.warn(`[ring] WS connect attempt ${attempt}/5 failed: ${err.message}. Retrying...`);
+        if (attempt < 5) await new Promise((r) => setTimeout(r, 250 * attempt));
       }
     }
     if (lastErr) throw lastErr;

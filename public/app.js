@@ -1139,9 +1139,17 @@
   // 8. Instant Game Launch (Starts WasmPlayer.js Immediately at 0ms in Parallel with Join)
   // -------------------------------------------------------------------------
   async function launchExperience(gameInput) {
-    if (isLaunching) return;
     const placeId = String(typeof gameInput === "object" ? gameInput.placeId : gameInput).trim();
     if (!placeId) return;
+
+    // If the WASM engine has already been booted once in this window session,
+    // perform a clean reload directly into the target place to ensure clean linear memory & sockets
+    if (window._wasmLoaded || (window.__placeId && window.__placeId !== placeId)) {
+      window.location.href = "/?placeId=" + encodeURIComponent(placeId);
+      return;
+    }
+
+    if (isLaunching) return;
     isLaunching = true;
 
     const auth = window.auth;
@@ -1167,8 +1175,12 @@
     auth.pendingJoinPromise = (async () => {
       const join = await auth.join(placeId);
       window.__join = join;
-      const peer = join.udmux || (join.connections && join.connections[0]);
-      if (!peer) throw new Error("join script has no endpoint");
+      let peer = join.udmux;
+      if (!peer && join.connections && join.connections.length) {
+        // Avoid internal RFC1918 datacenter IPs if a public address is available
+        peer = join.connections.find((c) => c && c.Address && !c.Address.startsWith("10.") && !c.Address.startsWith("192.168.")) || join.connections[0];
+      }
+      if (!peer || !peer.Address) throw new Error("join script has no reachable endpoint");
       await __rkRing.start({ host: peer.Address, port: peer.Port, script: join.script });
       return join;
     })();
@@ -1181,6 +1193,7 @@
     });
 
     // 3. Boot WasmPlayer.js immediately at 0ms
+    window._wasmLoaded = true;
     const s = document.createElement("script");
     s.src = "/engine/WasmPlayer.js";
     s.onerror = () => {

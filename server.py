@@ -386,10 +386,14 @@ def perform_gamejoin(place_id: int, session: ClientSession) -> dict:
 
         reply = post_once(None)
         tries = 0
-        while reply.get("status") == 0 and tries < 60:
+        job_id = reply.get("jobId")
+        # Status 0 = allocating/waiting for server, status 1 = loading/queued
+        while reply.get("status") in (0, 1) and tries < 75:
             tries += 1
-            time.sleep(0.04)
-            reply = post_once(None)
+            time.sleep(0.4)
+            reply = post_once(job_id)
+            if reply.get("jobId"):
+                job_id = reply.get("jobId")
 
         if reply.get("status") != 2:
             st = reply.get("status")
@@ -415,7 +419,15 @@ def perform_gamejoin(place_id: int, session: ClientSession) -> dict:
             reply["joinScriptUrl"] = f"https://assetgame.roblox.com/Game/Join.ashx?placeId={place_id}&jobId={job_enc}"
 
         udmux = (s.get("UdmuxEndpoints") or [None])[0]
-        connections = s.get("ServerConnections")
+        connections = s.get("ServerConnections") or []
+
+        # If udmux is missing, look for a non-internal public connection address
+        if not udmux and connections:
+            for c in connections:
+                addr = (c.get("Address") or "").strip()
+                if addr and not addr.startswith("10.") and not addr.startswith("192.168.") and not addr.startswith("172."):
+                    udmux = c
+                    break
 
         res = {
             "jobId": reply.get("jobId"),
@@ -808,6 +820,14 @@ class InsomniacHandler(BaseHTTPRequestHandler):
 
         conn = self.connection
         closed = threading.Event()
+        send_lock = threading.Lock()
+
+        def safe_sendall(payload: bytes):
+            with send_lock:
+                try:
+                    conn.sendall(payload)
+                except Exception:
+                    pass
 
         def udp_to_ws():
             while not closed.is_set():
@@ -815,7 +835,7 @@ class InsomniacHandler(BaseHTTPRequestHandler):
                     data = udp_sock.recv(65535)
                     if not data:
                         break
-                    conn.sendall(ws_build_frame(data, 0x02))
+                    safe_sendall(ws_build_frame(data, 0x02))
                 except ConnectionResetError:
                     continue
                 except OSError:
@@ -832,7 +852,7 @@ class InsomniacHandler(BaseHTTPRequestHandler):
                 if opcode == 0x08:  # CLOSE
                     break
                 if opcode == 0x09:  # PING
-                    conn.sendall(ws_build_frame(payload, 0x0A))
+                    safe_sendall(ws_build_frame(payload, 0x0A))
                     continue
                 if opcode in (0x01, 0x02) and payload:  # Binary / Text frame
                     try:

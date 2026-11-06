@@ -25,13 +25,16 @@
   }
 
   function b64_16(text) {
+    if (!text || typeof text !== "string") return null;
+    let clean = text.trim().replace(/-/g, "+").replace(/_/g, "/");
+    while (clean.length % 4 !== 0) clean += "=";
     let bin;
     try {
-      bin = atob(text);
+      bin = atob(clean);
     } catch (e) {
       return null;
     }
-    if (bin.length !== 16) return null;
+    if (bin.length < 16) return null;
     const out = new Uint8Array(16);
     for (let i = 0; i < 16; i++) out[i] = bin.charCodeAt(i);
     return out;
