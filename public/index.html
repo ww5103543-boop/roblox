@@ -5,9 +5,15 @@
   <meta charset="utf-8">
   <script>
     try {
-      var t = localStorage.getItem("weblox_theme") || "tokyo-night";
+      var t = localStorage.getItem("weblox_theme");
+      if (!t || t === "dark") {
+        t = "tokyo-night";
+        localStorage.setItem("weblox_theme", "tokyo-night");
+      }
       document.documentElement.setAttribute("data-theme", t);
-    } catch (e) {}
+    } catch (e) {
+      document.documentElement.setAttribute("data-theme", "tokyo-night");
+    }
   </script>
   <link rel="preconnect" href="https://thumbnails.roblox.com">
   <link rel="preconnect" href="https://apis.roblox.com">

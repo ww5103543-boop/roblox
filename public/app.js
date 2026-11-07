@@ -15,7 +15,7 @@
   addEventListener("unhandledrejection", (e) => console.error("[app] rejection:", e.reason));
 
   // -------------------------------------------------------------------------
-  // 0. Apply Theme Immediately (Automatically Default to Dark)
+  // 0. Apply Theme Immediately (Automatically Default to Tokyo Night)
   // -------------------------------------------------------------------------
   const THEME_KEY = "weblox_theme";
   function applyTheme(themeName) {
@@ -32,7 +32,11 @@
   applyTheme((() => {
     try {
       const stored = localStorage.getItem(THEME_KEY);
-      return (stored && ["dark", "tokyo-night", "light"].includes(stored)) ? stored : "tokyo-night";
+      if (!stored || stored === "dark") {
+        try { localStorage.setItem(THEME_KEY, "tokyo-night"); } catch (e) {}
+        return "tokyo-night";
+      }
+      return ["dark", "tokyo-night", "light"].includes(stored) ? stored : "tokyo-night";
     } catch (e) {
       return "tokyo-night";
     }
@@ -333,6 +337,10 @@
       el.classList.toggle("active", el.dataset.side === name);
     });
 
+    if (name !== "detail") {
+      document.title = "Waved";
+    }
+
     document.getElementById("rbx-main").scrollTop = 0;
   }
 
@@ -347,6 +355,7 @@
       }
     }
     showView("collection");
+    if (title) document.title = `${title} - Waved`;
   }
 
   // -------------------------------------------------------------------------
@@ -672,6 +681,7 @@
   // -------------------------------------------------------------------------
   function populateDetailDOM(game) {
     const cleanName = stripEmojis(game.name || `Place ${game.placeId}`);
+    document.title = cleanName ? `${cleanName} - Waved` : "Waved";
     document.getElementById("detail-banner-img").src =
       game.banner || game.thumb || makeFallbackThumb(cleanName, game.placeId, true);
     document.getElementById("detail-icon-sm").src =
