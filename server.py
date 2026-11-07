@@ -53,7 +53,7 @@ CSP = (
     "img-src 'self' https: http: blob: data:; "
     "media-src 'self' https: blob: data:; font-src 'self' blob: data:; "
     "style-src 'self' 'unsafe-inline'; "
-    "frame-ancestors 'self'"
+    "frame-ancestors *"
 )
 
 SECURITY_HEADERS = [
